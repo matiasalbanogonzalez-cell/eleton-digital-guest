@@ -1,0 +1,105 @@
+// Recreación Eleton — esquema de base de datos
+// Basado en el documento de requerimientos: Usuario, Actividad, Inscripción, Instructor
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Rol {
+  HUESPED
+  RECREADOR
+  ADMIN
+}
+
+enum Categoria {
+  KIDS
+  ADOLESCENTES
+  ADULTOS
+}
+
+enum EstadoActividad {
+  ABIERTA
+  CUPO_LLENO
+  CANCELADA
+  FINALIZADA
+}
+
+enum EstadoInscripcion {
+  CONFIRMADA
+  LISTA_ESPERA
+  CANCELADA
+}
+
+model Usuario {
+  id            String    @id @default(uuid())
+  nombre        String
+  apellido      String
+  email         String    @unique
+  passwordHash  String
+  habitacion    String?
+  telefono      String?
+  rol           Rol       @default(HUESPED)
+  creadoEn      DateTime  @default(now())
+
+  actividadesCreadas Actividad[]    @relation("ActividadesCreadasPor")
+  inscripciones      Inscripcion[]
+
+  @@map("usuarios")
+}
+
+model Instructor {
+  id         String      @id @default(uuid())
+  nombre     String
+  apellido   String
+  telefono   String?
+  email      String?
+  actividades Actividad[]
+
+  @@map("instructores")
+}
+
+model Actividad {
+  id            String          @id @default(uuid())
+  nombre        String
+  descripcion   String
+  categoria     Categoria
+  imagenUrl     String?
+  fecha         DateTime
+  horaInicio    String          // "15:00"
+  horaFin       String          // "16:00"
+  lugar         String
+  edadMinima    Int
+  edadMaxima    Int
+  cupoMaximo    Int
+  estado        EstadoActividad @default(ABIERTA)
+  creadoEn      DateTime        @default(now())
+
+  instructorId  String?
+  instructor    Instructor?     @relation(fields: [instructorId], references: [id])
+
+  creadaPorId   String?
+  creadaPor     Usuario?        @relation("ActividadesCreadasPor", fields: [creadaPorId], references: [id])
+
+  inscripciones Inscripcion[]
+
+  @@map("actividades")
+}
+
+model Inscripcion {
+  id               String            @id @default(uuid())
+  usuarioId        String
+  usuario          Usuario           @relation(fields: [usuarioId], references: [id])
+  actividadId      String
+  actividad        Actividad         @relation(fields: [actividadId], references: [id])
+  fechaInscripcion DateTime          @default(now())
+  estado           EstadoInscripcion @default(CONFIRMADA)
+  asistio          Boolean           @default(false)
+
+  // Regla de negocio: un huésped no puede inscribirse dos veces a la misma actividad
+  @@unique([usuarioId, actividadId])
+  @@map("inscripciones")
+}
