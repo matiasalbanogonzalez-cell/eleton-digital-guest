@@ -14,14 +14,7 @@ export default function Home() {
             Tu estadía, en la palma de la mano. Descubrí experiencias pensadas para descansar,
             divertirte y reconectar en un resort premium.
           </p>
-          <div className="hero-actions">
-            <Link to="/recreacion" className="btn-primary">
-              Descubrir recreación
-            </Link>
-            <Link to="/informacion" className="btn-ghost">
-              Ver servicios
-            </Link>
-          </div>
+          
         </div>
 
         <div className="hero-image-card">
@@ -39,7 +32,7 @@ export default function Home() {
         <div className="section-row">
           <div>
             <div className="section-eyebrow font-mono">Explorá el resort</div>
-            <h2 className="section-title font-display">Módulos disponibles</h2>
+            
           </div>
         </div>
 
@@ -87,16 +80,20 @@ export default function Home() {
           </div>
           <div className="info-compact">
             <div>
-              <span className="info-label">Recepción</span>
-              <p>Abierta 24 horas</p>
+              <span className="info-label">Desayuno</span>
+              <p>de 08:00 hs a 10:30 hs</p>
             </div>
             <div>
               <span className="info-label">Check-in</span>
-              <p>Desde las 16:00</p>
+              <p>16:00 hs</p>
+            </div>
+             <div>
+              <span className="info-label">Check-out</span>
+              <p>10:00 hs</p>
             </div>
             <div>
               <span className="info-label">Recreación</span>
-              <p>Actividades de 10:00 a 18:00</p>
+              <p>Actividades de 10:00 hs a 18:00 hs</p>
             </div>
           </div>
         </div>

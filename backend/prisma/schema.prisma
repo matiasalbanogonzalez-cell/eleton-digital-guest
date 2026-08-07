@@ -86,6 +86,7 @@ model Actividad {
 
   inscripciones Inscripcion[]
 
+  @@unique([fecha, horaInicio, categoria, nombre])
   @@map("actividades")
 }
 

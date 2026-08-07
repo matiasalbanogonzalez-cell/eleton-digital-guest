@@ -59,7 +59,7 @@ body {
   font-size: 22px; flex-shrink:0;
 }
 .ticket-nombre { font-family:'Bebas Neue'; font-size: 22px; letter-spacing:0.02em; line-height:1.08; color: var(--text); }
-.ticket-meta { font-size: 12.5px; color: var(--text-soft); margin-top: 6px; line-height: 1.55; }
+.ticket-meta { font-size: 12.5px; color: var(--paper); margin-top: 6px; line-height: 1.55; }
 .cat-badge {
   display:inline-block; font-family:'IBM Plex Mono'; font-size: 10px; font-weight:700;
   padding: 4px 10px; border-radius: 999px; margin-top: 10px; letter-spacing: 0.05em;
@@ -138,7 +138,7 @@ body {
   gap: 8px;
   font-family:'IBM Plex Mono';
   font-size: 13px;
-  color: var(--text-soft);
+  color: var(--paper);
 }
 
 .activity-card-meta span {
@@ -322,8 +322,12 @@ body {
   font-size: 10px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--paper-2);
-  opacity: 0.75;
+  color: var(--paper);
+  opacity: 0.85;
+}
+
+.detail-metric span {
+  color: var(--paper);
 }
 
 .detail-form {
@@ -358,12 +362,122 @@ body {
   color: #FEE8B0;
 }
 
-.nav-tab {
-  font-family:'IBM Plex Mono', monospace; font-size: 12px; padding: 7px 13px;
-  border-radius: 20px; border: 1px solid rgba(251,246,234,0.25); color: var(--paper-2);
-  background: transparent; white-space: nowrap; cursor: pointer;
+.page-title {
+  color: var(--paper);
+  font-size: 28px;
+  line-height: 1.05;
+  margin-bottom: 8px;
 }
-.nav-tab.active { background: var(--gold); color: var(--ink); border-color: var(--gold); font-weight:600; }
+
+.page-subtitle {
+  color: var(--paper-2);
+  opacity: 0.85;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.nav-tab {
+  font-family:'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(251,246,234,0.25);
+  color: var(--paper-2);
+  background: transparent;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.nav-tab.active { background: var(--gold); color: var(--ink); border-color: var(--gold); font-weight:700; }
+
+/* La marca usa Bebas; los controles y el contenido de la agenda, DM Sans. */
+.agenda-date {
+  margin: 0 0 20px;
+  color: var(--paper);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.agenda-recreacion {
+  overflow-x: auto;
+  border: 1px solid rgba(251, 246, 234, 0.12);
+  border-radius: 18px;
+  background: rgba(251, 246, 234, 0.06);
+}
+
+.agenda-header,
+.agenda-row {
+  display: grid;
+  grid-template-columns: 62px repeat(3, minmax(130px, 1fr));
+  min-width: 500px;
+}
+
+.agenda-header {
+  color: var(--gold);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(251, 246, 234, 0.16);
+}
+
+.agenda-header > div,
+.agenda-row > div {
+  padding: 14px 12px;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+}
+.agenda-header > div:not(:first-child),
+.agenda-row > div:not(:first-child) { border-left: 1px solid rgba(251, 246, 234, 0.1); }
+.agenda-row + .agenda-row { border-top: 1px solid rgba(251, 246, 234, 0.1); }
+
+.agenda-hora {
+  color: var(--paper);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.actividad-mini-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+  color: var(--paper);
+  font-family: 'DM Sans', sans-serif;
+  line-height: 1.3;
+}
+.actividad-mini-icono {
+  flex: 0 0 auto;
+  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
+  font-size: 17px;
+  line-height: 1.2;
+}
+.actividad-mini-info { min-width: 0; }
+.actividad-mini-info strong {
+  display: block;
+  color: var(--paper);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.actividad-mini-info span {
+  display: block;
+  margin-top: 3px;
+  color: var(--paper-2);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  opacity: 0.72;
+  overflow-wrap: anywhere;
+}
+.actividad-vacia { color: rgba(243, 236, 220, 0.46); font-family: 'DM Sans', sans-serif; }
 
 .form-field { margin-bottom: 12px; }
 .form-label { font-family:'IBM Plex Mono'; font-size: 10.5px; color: var(--paper-2); opacity:0.75; text-transform:uppercase; letter-spacing:0.04em; display:block; margin-bottom: 5px; }
@@ -1032,4 +1146,44 @@ body.menu-open {
   .page-surface { padding: 28px 28px 42px; }
   .activities-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .footer-columns { gap: 32px; }
+}
+.btn-reservar {
+
+background: var(--gold);
+color: var(--ink);
+
+border:none;
+padding:8px 14px;
+
+border-radius:20px;
+
+font-family:'IBM Plex Mono';
+font-size:11px;
+font-weight:700;
+
+cursor:pointer;
+
+margin-top:8px;
+
+transition:
+transform .2s ease,
+box-shadow .2s ease;
+
+}
+
+
+.btn-reservar:hover {
+
+transform:translateY(-2px);
+
+box-shadow:
+0 8px 20px rgba(216,164,57,.35);
+
+}
+
+
+.btn-reservar:active {
+
+transform:scale(.95);
+
 }

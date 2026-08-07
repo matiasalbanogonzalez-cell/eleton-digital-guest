@@ -30,11 +30,17 @@ function serializar(actividad) {
 
 // Caso 1 y 2: listar actividades, con filtro opcional por categoría
 async function listar(req, res) {
-  const { categoria } = req.query;
+  const { categoria, fecha } = req.query;
 
   const where = {};
   if (categoria && categoria !== "TODAS") {
     where.categoria = categoria;
+  }
+  if (fecha) {
+    const inicioDia = new Date(`${fecha}T00:00:00.000Z`);
+    const finDia = new Date(`${fecha}T00:00:00.000Z`);
+    finDia.setUTCDate(finDia.getUTCDate() + 1);
+    if (!Number.isNaN(inicioDia.getTime())) where.fecha = { gte: inicioDia, lt: finDia };
   }
 
   const actividades = await prisma.actividad.findMany({
