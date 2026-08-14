@@ -14,7 +14,7 @@ export default function Home() {
             Tu estadía, en la palma de la mano. Descubrí experiencias pensadas para descansar,
             divertirte y reconectar en un resort premium.
           </p>
-          
+
         </div>
 
         <div className="hero-image-card">
@@ -22,7 +22,7 @@ export default function Home() {
           <div className="hero-image-content">
             <div className="hero-image-tag">Experiencias Eleton</div>
             <div className="hero-image-copy">
-               actividades para toda la familia y atardeceres de ensueño....
+              actividades para toda la familia y atardeceres de ensueño....
             </div>
           </div>
         </div>
@@ -32,7 +32,7 @@ export default function Home() {
         <div className="section-row">
           <div>
             <div className="section-eyebrow font-mono">Explorá el resort</div>
-            
+
           </div>
         </div>
 
@@ -65,9 +65,9 @@ export default function Home() {
             <p>Sabores locales con una carta fresca y elegante para cada momento del día.</p>
           </article>
           <article className="featured-card">
-            <div className="featured-card-eyebrow font-mono">Spa</div>
-            <h3>Rituales de bienestar</h3>
-            <p>Descubrí tratamientos relajantes diseñados para tu descanso absoluto.</p>
+            <div className="featured-card-eyebrow font-mono">Eventos</div>
+            <h3>Bodas y celebraciones</h3>
+            <p>Salones para bodas, congresos y reuniones corporativas con organización a medida.</p>
           </article>
         </div>
       </section>
@@ -87,7 +87,7 @@ export default function Home() {
               <span className="info-label">Check-in</span>
               <p>16:00 hs</p>
             </div>
-             <div>
+            <div>
               <span className="info-label">Check-out</span>
               <p>10:00 hs</p>
             </div>

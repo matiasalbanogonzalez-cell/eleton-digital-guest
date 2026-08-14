@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home, Sparkles, Theater, Droplet, Coffee, Info, X } from "lucide-react";
+import { Home, Sparkles, Theater, Droplet, Coffee, PartyPopper, X } from "lucide-react";
 import { MODULOS } from "../constants/modulos";
 
 const ICONS = {
@@ -9,7 +9,7 @@ const ICONS = {
   teatro: Theater,
   spa: Droplet,
   resto: Coffee,
-  informacion: Info,
+  eventos: PartyPopper,
 };
 
 export default function MobileNavigation({ open, onClose }) {
@@ -54,7 +54,7 @@ export default function MobileNavigation({ open, onClose }) {
                 >
                   <Icon className="nav-drawer-link-icon" size={16} />
                   <span>{m.label}</span>
-
+                  {!m.activo && <span className="nav-drawer-link-tag">Próximamente</span>}
                 </Link>
               </li>
             );

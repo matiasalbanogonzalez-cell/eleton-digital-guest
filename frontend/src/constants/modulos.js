@@ -8,10 +8,9 @@ export const MODULOS = [
     path: "/hotel",
     label: "Hotel",
     emoji: "🏨",
-    activo: false,
+    activo: true,
     tagline: "Tu estadía, a mano",
-    proximamente:
-      "Información de tu habitación, servicios del hotel y contacto directo con recepción.",
+    proximamente: null,
   },
   {
     id: "recreacion",
@@ -50,13 +49,14 @@ export const MODULOS = [
     proximamente: "Nuestra carta, horarios de servicio y reserva de mesa.",
   },
   {
-    id: "informacion",
-    path: "/informacion",
-    label: "Información",
-    emoji: "ℹ️",
+    id: "eventos",
+    path: "/eventos",
+    label: "Eventos",
+    emoji: "🎟️",
     activo: false,
-    tagline: "Todo lo que necesitás saber",
-    proximamente: "Wifi, horarios, mapas del predio y contactos útiles del hotel.",
+    tagline: "Bodas, congresos y celebraciones",
+    proximamente:
+      "Salón de eventos, organización de bodas, congresos y celebraciones corporativas. Muy pronto vas a poder consultar disponibilidad desde acá.",
   },
 ];
 

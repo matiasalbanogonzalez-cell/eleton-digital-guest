@@ -17,17 +17,10 @@ import {
     Instagram,
     Facebook,
     MessageCircle,
+    Hash,
 } from "lucide-react";
 import PublicLayout from "../components/PublicLayout";
 
-const GALERIA = [
-    "https://eleton.com.ar/wp-content/uploads/2021/12/spa-eleton-1.jpg",
-    "https://eleton.com.ar/wp-content/uploads/2021/12/spa-eleton-2.jpg",
-    "https://eleton.com.ar/wp-content/uploads/2021/12/spa-eleton-3.jpg",
-    "https://eleton.com.ar/wp-content/uploads/2021/12/spa-eleton-4.jpg",
-    "https://eleton.com.ar/wp-content/uploads/2021/12/spa-eleton-5.jpg",
-    "https://eleton.com.ar/wp-content/uploads/2021/12/spa-eleton-6.jpg",
-];
 
 const SERVICIOS = [
     { icon: Waves, label: "Piscina climatizada con hidromasaje, cascadas y chorros cervicales" },
@@ -82,20 +75,6 @@ export default function Spa() {
                 </div>
             </section>
 
-            <section className="spa-gallery-section">
-                <div className="spa-gallery">
-                    {GALERIA.map((src, i) => (
-                        <img
-                            key={src}
-                            src={src}
-                            alt={`Spa Eleton ${i + 1}`}
-                            className="spa-gallery-img"
-                            loading="lazy"
-                        />
-                    ))}
-                </div>
-            </section>
-
             <section className="spa-services-section">
                 <div className="section-row">
                     <div>
@@ -136,6 +115,26 @@ export default function Spa() {
                             <p>+54 9 351 767-7652</p>
                         </span>
                     </a>
+
+                    <div className="spa-contact-card spa-contact-card-static">
+                        <span className="spa-contact-icon">
+                            <Hash size={18} />
+                        </span>
+                        <span>
+                            <span className="info-label">Interno Spa</span>
+                            <p>1149</p>
+                        </span>
+                    </div>
+
+                    <div className="spa-contact-card spa-contact-card-static">
+                        <span className="spa-contact-icon">
+                            <Hash size={18} />
+                        </span>
+                        <span>
+                            <span className="info-label">Interno Guest Service</span>
+                            <p>2243</p>
+                        </span>
+                    </div>
 
                     <a href="tel:+5493541584066" className="spa-contact-card">
                         <span className="spa-contact-icon">

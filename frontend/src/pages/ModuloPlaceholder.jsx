@@ -1,9 +1,8 @@
-
 import { Link } from "react-router-dom";
 import PublicLayout from "../components/PublicLayout";
 
 const IMAGES = {
-  hotel: "/images/modules/hotel.jpg",
+  teatro: "/images/modules/teatro.jpg",
 };
 
 export default function ModuloPlaceholder({ modulo }) {
@@ -12,36 +11,24 @@ export default function ModuloPlaceholder({ modulo }) {
   return (
     <PublicLayout>
       <section className="placeholder-hero">
-
         <Link to="/" className="btn-ghost placeholder-back">
           ← Inicio
         </Link>
 
         {imagen && (
           <div className="placeholder-image">
-            <img
-              src={imagen}
-              alt={modulo.label}
-            />
+            <img src={imagen} alt={modulo.label} />
           </div>
         )}
 
         <div className="placeholder-content">
-          <div className="placeholder-badge font-mono">
-            Hotel Eleton
-          </div>
+          <div className="placeholder-badge font-mono">Hotel Eleton</div>
 
-          <h1 className="font-display placeholder-title">
-            {modulo.label}
-          </h1>
+          <h1 className="font-display placeholder-title">{modulo.label}</h1>
 
-          <p className="placeholder-tagline">
-            {modulo.tagline}
-          </p>
+          <p className="placeholder-tagline">{modulo.tagline}</p>
 
-          <p className="placeholder-text">
-            {modulo.proximamente}
-          </p>
+          <p className="placeholder-text">{modulo.proximamente}</p>
 
           <Link
             to="/"
@@ -54,7 +41,6 @@ export default function ModuloPlaceholder({ modulo }) {
             Volver al inicio
           </Link>
         </div>
-
       </section>
     </PublicLayout>
   );

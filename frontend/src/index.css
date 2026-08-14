@@ -1276,6 +1276,27 @@ body.menu-open {
   margin-bottom: 20px;
 }
 
+.placeholder-image {
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto 24px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+}
+
+.placeholder-image img {
+  display: block;
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.placeholder-content {
+  max-width: 440px;
+  margin: 0 auto;
+}
+
 .placeholder-emoji {
   font-size: 52px;
   margin-bottom: 10px;
@@ -1335,24 +1356,6 @@ body.menu-open {
   align-items: center;
   gap: 8px;
   text-decoration: none;
-}
-
-.spa-gallery-section {
-  padding-bottom: 44px;
-}
-
-.spa-gallery {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.spa-gallery-img {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .spa-services-section {
@@ -1416,6 +1419,15 @@ body.menu-open {
   background: rgba(255, 255, 255, 0.08);
 }
 
+.spa-contact-card-static {
+  cursor: default;
+}
+
+.spa-contact-card-static:hover {
+  transform: none;
+  background: rgba(255, 255, 255, 0.05);
+}
+
 .spa-contact-icon {
   width: 38px;
   height: 38px;
@@ -1437,6 +1449,163 @@ body.menu-open {
   color: var(--paper);
   font-weight: 600;
   font-size: 13.5px;
+}
+
+/* --- Página Hotel --- */
+.hotel-hero .hero-title {
+  font-size: clamp(34px, 6vw, 50px);
+}
+
+.hotel-regimen-section {
+  padding-bottom: 44px;
+}
+
+.hotel-regimen-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+
+.hotel-regimen-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 18px 20px;
+}
+
+.hotel-regimen-title {
+  font-family: 'Bebas Neue';
+  font-size: 20px;
+  letter-spacing: 0.02em;
+  color: var(--paper);
+  margin: 6px 0 6px;
+}
+
+.hotel-regimen-copy {
+  color: var(--paper-2);
+  opacity: 0.8;
+  font-size: 13.5px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.hotel-rooms-section {
+  padding-bottom: 48px;
+}
+
+.hotel-numeros-section {
+  padding-bottom: 44px;
+}
+
+.hotel-wifi-section {
+  padding-bottom: 44px;
+}
+
+.hotel-wifi-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+
+.hotel-wifi-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 16px 18px;
+}
+
+.hotel-wifi-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(216, 164, 57, 0.14);
+  color: var(--gold);
+}
+
+.hotel-wifi-red {
+  font-family: 'Bebas Neue';
+  font-size: 19px;
+  letter-spacing: 0.02em;
+  color: var(--paper);
+  margin: 3px 0 2px;
+  line-height: 1.1;
+}
+
+.hotel-wifi-clave {
+  font-family: 'IBM Plex Mono';
+  font-size: 12.5px;
+  color: var(--paper-2);
+  opacity: 0.85;
+  margin: 0;
+}
+
+.hotel-rooms-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+
+.hotel-room-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 18px 20px;
+}
+
+.hotel-room-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.hotel-room-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(216, 164, 57, 0.14);
+  color: var(--gold);
+}
+
+.hotel-room-name {
+  font-family: 'Bebas Neue';
+  font-size: 19px;
+  letter-spacing: 0.02em;
+  color: var(--paper);
+  margin: 0;
+  line-height: 1.1;
+}
+
+.hotel-room-capacity {
+  font-family: 'IBM Plex Mono';
+  font-size: 11px;
+  color: var(--gold);
+  margin: 3px 0 0;
+}
+
+.hotel-room-detalle {
+  color: var(--paper-2);
+  opacity: 0.85;
+  font-size: 13.5px;
+  line-height: 1.6;
+  margin: 0 0 10px;
+}
+
+.hotel-room-amenities {
+  color: var(--paper-2);
+  opacity: 0.65;
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 0;
 }
 
 /* --- Footer público --- */
@@ -1554,6 +1723,18 @@ body.menu-open {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .hotel-regimen-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hotel-rooms-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hotel-wifi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .footer-columns {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     text-align: left;
@@ -1616,16 +1797,16 @@ body.menu-open {
     gap: 16px;
   }
 
-  .spa-gallery {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
   .spa-services-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .spa-contact-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .hotel-rooms-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .detail-grid {

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { Menu, X, Home, Sparkles, Theater, Droplet, Coffee, Info, Key } from "lucide-react";
+import { Menu, X, Home, Sparkles, Theater, Droplet, Coffee, PartyPopper, Key } from "lucide-react";
 import MobileNavigation from "./MobileNavigation";
 
 const NAV_LINKS = [
@@ -9,7 +9,7 @@ const NAV_LINKS = [
   { to: "/teatro", label: "Teatro", icon: Theater },
   { to: "/spa", label: "Spa", icon: Droplet },
   { to: "/resto", label: "Restó", icon: Coffee },
-  { to: "/informacion", label: "Información", icon: Info },
+  { to: "/eventos", label: "Eventos", icon: PartyPopper },
 ];
 
 export default function Navbar() {
