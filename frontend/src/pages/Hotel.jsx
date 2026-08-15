@@ -10,16 +10,13 @@ import {
     PartyPopper,
     Presentation,
     Users,
-    MapPin,
-    Phone,
-    Instagram,
-    Facebook,
-    MessageCircle,
-    BedDouble,
+    Clock,
+    Coffee,
     BellRing,
     HelpCircle,
     Wifi,
 } from "lucide-react";
+
 import PublicLayout from "../components/PublicLayout";
 
 const SERVICIOS = [
@@ -47,43 +44,10 @@ const WIFI_REDES = [
     { zona: "Habitaciones", red: "Rooms Eleton", clave: "1122334455" },
 ];
 
-const HABITACIONES = [
-    {
-        nombre: "Standard",
-        capacidad: "Hasta 3 personas",
-        detalle:
-            "Cama matrimonial y una individual, con posibilidad de configurarse con tres camas individuales.",
-        amenities: "Aire acondicionado frío/calor · Caja de seguridad · TV Led 32'' · Frigobar · Secador de pelo · Cerradura magnética · Teléfono",
-    },
-    {
-        nombre: "Standard con Balcón",
-        capacidad: "Hasta 3 personas",
-        detalle: "Misma configuración que la Standard, sumando balcón propio.",
-        amenities: "Balcón · Aire acondicionado frío/calor · Caja de seguridad · TV Led 32'' · Frigobar · Secador de pelo · Cerradura magnética · Teléfono",
-    },
-    {
-        nombre: "Standard View",
-        capacidad: "Hasta 3 personas",
-        detalle: "Ubicadas en el piso más alto del hotel, con vista panorámica a la ciudad, las sierras y el lago San Roque.",
-        amenities: "Vista panorámica · Aire acondicionado frío/calor · Caja de seguridad · TV Led 32'' · Frigobar · Secador de pelo · Cerradura magnética · Teléfono",
-    },
-    {
-        nombre: "Superior con Balcón",
-        capacidad: "Hasta 4 personas",
-        detalle: "Ideal para familias o grupos de amigos, con balcón propio.",
-        amenities: "Balcón · Aire acondicionado frío/calor · Caja de seguridad · TV Led 32'' · Frigobar · Secador de pelo · Cerradura magnética · Teléfono",
-    },
-    {
-        nombre: "Superior Adaptada",
-        capacidad: "Hasta 4 personas",
-        detalle: "Cercana al ascensor, con puerta y baño completamente adaptados para movilidad reducida.",
-        amenities: "Habitación adaptada · Aire acondicionado frío/calor · Caja de seguridad · TV Led 32'' · Frigobar · Secador de pelo · Cerradura magnética · Teléfono",
-    },
-];
-
 export default function Hotel() {
     return (
         <PublicLayout>
+            {/* HERO */}
             <section className="placeholder-hero hotel-hero">
                 <Link to="/" className="btn-ghost placeholder-back">
                     ← Inicio
@@ -91,47 +55,9 @@ export default function Hotel() {
 
                 <div className="section-title-eyebrow font-mono">Villa Carlos Paz, Córdoba</div>
                 <h1 className="hero-title font-display spa-hero-title">Hotel Eleton</h1>
-                <p className="hero-sub spa-hero-sub">
-                    Ubicado en el acceso a la ciudad de Villa Carlos Paz, sobre la ladera de la montaña y
-                    con una vista inigualable al lago San Roque y las sierras de Córdoba. Elegancia,
-                    comodidad, seguridad, calidad y servicio personalizado hacen de Eleton un referente
-                    del destino.
-                </p>
-
-                <div className="spa-hero-actions">
-                    <a
-                        className="btn-primary spa-whatsapp-btn"
-                        href="https://wa.me/5493515696990?text=Hola%2C+consulto+desde+la+app+del+hotel"
-                        target="_blank"
-                        rel="noreferrer"
-                    >
-                        <MessageCircle size={16} />
-                        Consultar por WhatsApp
-                    </a>
-                </div>
             </section>
 
-            <section className="hotel-regimen-section">
-                <div className="hotel-regimen-grid">
-                    <div className="hotel-regimen-card">
-                        <div className="info-label">Temporada Verano y Semana Santa</div>
-                        <p className="hotel-regimen-title">Servicio All Inclusive</p>
-                        <p className="hotel-regimen-copy">
-                            Todas las comidas y bebidas incluidas, cenas temáticas, obras de teatro y
-                            actividades recreativas todos los días.
-                        </p>
-                    </div>
-                    <div className="hotel-regimen-card">
-                        <div className="info-label">Resto del año</div>
-                        <p className="hotel-regimen-title">Alojamiento con desayuno buffet</p>
-                        <p className="hotel-regimen-copy">
-                            El mismo confort y atención personalizada, con desayuno buffet incluido cada
-                            mañana.
-                        </p>
-                    </div>
-                </div>
-            </section>
-
+            {/* SERVICIOS */}
             <section className="spa-services-section">
                 <div className="section-row">
                     <div>
@@ -152,33 +78,7 @@ export default function Hotel() {
                 </div>
             </section>
 
-            <section className="hotel-rooms-section">
-                <div className="section-row">
-                    <div>
-                        <div className="section-eyebrow font-mono">Habitaciones & Suites</div>
-                        <h2 className="section-title font-display">Elegí tu estilo de estadía</h2>
-                    </div>
-                </div>
-
-                <div className="hotel-rooms-grid">
-                    {HABITACIONES.map((h) => (
-                        <div className="hotel-room-card" key={h.nombre}>
-                            <div className="hotel-room-header">
-                                <span className="hotel-room-icon">
-                                    <BedDouble size={18} />
-                                </span>
-                                <div>
-                                    <p className="hotel-room-name">{h.nombre}</p>
-                                    <p className="hotel-room-capacity">{h.capacidad}</p>
-                                </div>
-                            </div>
-                            <p className="hotel-room-detalle">{h.detalle}</p>
-                            <p className="hotel-room-amenities">{h.amenities}</p>
-                        </div>
-                    ))}
-                </div>
-            </section>
-
+            {/* NÚMEROS IMPORTANTES */}
             <section className="hotel-numeros-section">
                 <div className="section-row">
                     <div>
@@ -205,6 +105,77 @@ export default function Hotel() {
                 </div>
             </section>
 
+            {/* HORARIOS */}
+            <section className="hotel-horarios-section">
+                <div className="section-row">
+                    <div>
+                        <div className="section-eyebrow font-mono">Horarios</div>
+                        <h2 className="section-title font-display">Organizá tu estadía</h2>
+                    </div>
+                </div>
+
+                <div className="hotel-horarios-grid">
+                    {/* SPA */}
+                    <div className="hotel-horario-card">
+                        <div className="hotel-horario-header">
+                            <span className="hotel-horario-icon">
+                                <Sparkles size={18} />
+                            </span>
+                            <div>
+                                <div className="info-label">Bienestar</div>
+                                <h3>SPA</h3>
+                            </div>
+                        </div>
+
+                        <div className="hotel-horario-item">
+                            <Clock size={16} />
+                            <span>
+                                Todos los días
+                                <strong>09:00 a 21:00</strong>
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* RESTÓ */}
+                    <div className="hotel-horario-card">
+                        <div className="hotel-horario-header">
+                            <span className="hotel-horario-icon">
+                                <UtensilsCrossed size={18} />
+                            </span>
+                            <div>
+                                <div className="info-label">Gastronomía</div>
+                                <h3>Restó</h3>
+                            </div>
+                        </div>
+
+                        <div className="hotel-horario-item">
+                            <Coffee size={16} />
+                            <span>
+                                Desayuno
+                                <strong>08:00 a 10:30</strong>
+                            </span>
+                        </div>
+
+                        <div className="hotel-horario-item">
+                            <UtensilsCrossed size={16} />
+                            <span>
+                                Almuerzo
+                                <strong>12:00 a 15:00</strong>
+                            </span>
+                        </div>
+
+                        <div className="hotel-horario-item">
+                            <UtensilsCrossed size={16} />
+                            <span>
+                                Cena
+                                <strong>20:30 a 23:30</strong>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* WIFI */}
             <section className="hotel-wifi-section">
                 <div className="section-row">
                     <div>
@@ -226,82 +197,6 @@ export default function Hotel() {
                             </div>
                         </div>
                     ))}
-                </div>
-            </section>
-
-            <section className="spa-contact-section">
-                <div className="section-row">
-                    <div>
-                        <div className="section-eyebrow font-mono">Contacto</div>
-                        <h2 className="section-title font-display">Vení a conocernos</h2>
-                    </div>
-                </div>
-
-                <div className="spa-contact-grid">
-                    <a
-                        href="https://www.google.com/maps/search/?api=1&query=Eleton+Resort+%26+SPA+Villa+Carlos+Paz"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="spa-contact-card"
-                    >
-                        <span className="spa-contact-icon">
-                            <MapPin size={18} />
-                        </span>
-                        <span>
-                            <span className="info-label">Ubicación</span>
-                            <p>Villa Carlos Paz, Córdoba</p>
-                        </span>
-                    </a>
-
-                    <a href="tel:+5493541584066" className="spa-contact-card">
-                        <span className="spa-contact-icon">
-                            <Phone size={18} />
-                        </span>
-                        <span>
-                            <span className="info-label">Recepción</span>
-                            <p>+54 9 3541 58-4066</p>
-                        </span>
-                    </a>
-
-                    <a href="tel:+5493515696990" className="spa-contact-card">
-                        <span className="spa-contact-icon">
-                            <Phone size={18} />
-                        </span>
-                        <span>
-                            <span className="info-label">Reservas</span>
-                            <p>+54 9 351 569-6990</p>
-                        </span>
-                    </a>
-
-                    <a
-                        href="https://www.instagram.com/eletonresort/"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="spa-contact-card"
-                    >
-                        <span className="spa-contact-icon">
-                            <Instagram size={18} />
-                        </span>
-                        <span>
-                            <span className="info-label">Instagram</span>
-                            <p>@eletonresort</p>
-                        </span>
-                    </a>
-
-                    <a
-                        href="https://www.facebook.com/eletonresort"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="spa-contact-card"
-                    >
-                        <span className="spa-contact-icon">
-                            <Facebook size={18} />
-                        </span>
-                        <span>
-                            <span className="info-label">Facebook</span>
-                            <p>Eleton Resort</p>
-                        </span>
-                    </a>
                 </div>
             </section>
         </PublicLayout>

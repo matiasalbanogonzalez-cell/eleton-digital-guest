@@ -59,15 +59,18 @@ export default function Home() {
               <p>Disfrutá de una tarde de diversión con tu familia en nuestro bingo familiar.</p>
             </div>
           </article>
-          <article className="featured-card">
+          <Link to="/resto" className="featured-card featured-card-link">
             <div className="featured-card-eyebrow font-mono">Restó</div>
-            <h3>Menú de temporada</h3>
+            <h3>Plato del día</h3>
             <p>Sabores locales con una carta fresca y elegante para cada momento del día.</p>
-          </article>
+            <span className="featured-card-cta">Ingresá a la carta para ver mas opciones→</span>
+          </Link>
           <article className="featured-card">
             <div className="featured-card-eyebrow font-mono">Eventos</div>
-            <h3>Bodas y celebraciones</h3>
-            <p>Salones para bodas, congresos y reuniones corporativas con organización a medida.</p>
+            <h3>Proximos Eventos</h3>
+            <p>Sala Francisco</p>
+            <p>Salon Mahatama</p>
+            <p>Sala de reuniones</p>
           </article>
         </div>
       </section>

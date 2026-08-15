@@ -44,9 +44,9 @@ export const MODULOS = [
     path: "/resto",
     label: "Restó",
     emoji: "🍽️",
-    activo: false,
+    activo: true,
     tagline: "Sabores de autor",
-    proximamente: "Nuestra carta, horarios de servicio y reserva de mesa.",
+    proximamente: null,
   },
   {
     id: "eventos",

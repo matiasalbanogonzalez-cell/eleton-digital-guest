@@ -9,6 +9,7 @@ import MisActividades from "./pages/MisActividades";
 import PanelRecreador from "./pages/PanelRecreador";
 import Spa from "./pages/Spa";
 import Hotel from "./pages/Hotel";
+import Resto from "./pages/Resto";
 import RutaProtegida from "./components/RutaProtegida";
 import { MODULOS } from "./constants/modulos";
 
@@ -43,6 +44,9 @@ export default function App() {
 
       {/* Módulo Hotel — público para huéspedes */}
       <Route path="/hotel" element={<Hotel />} />
+
+      {/* Módulo Restó — carta y reservas embebidas */}
+      <Route path="/resto" element={<Resto />} />
 
       {/* Módulos todavía no desarrollados: página placeholder profesional */}
       {MODULOS.filter((m) => !m.activo).map((m) => (
