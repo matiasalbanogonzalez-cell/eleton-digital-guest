@@ -1,3 +1,4 @@
+console.log("### INDEX.JS TOP - ARCHIVO CORRECTO ###");
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
@@ -6,6 +7,7 @@ const cookieParser = require("cookie-parser");
 const authRoutes = require("./routes/authRoutes");
 const actividadRoutes = require("./routes/actividadRoutes");
 const inscripcionRoutes = require("./routes/inscripcionRoutes");
+const restoRoutes = require("./routes/restoRoutes");
 
 const app = express();
 
@@ -18,6 +20,7 @@ app.get("/api/health", (req, res) => res.json({ ok: true, servicio: "Recreación
 app.use("/api/auth", authRoutes);
 app.use("/api/actividades", actividadRoutes);
 app.use("/api/inscripciones", inscripcionRoutes);
+app.use("/api/resto", restoRoutes);
 
 // Manejo de rutas no encontradas
 app.use((req, res) => res.status(404).json({ error: "Ruta no encontrada." }));

@@ -75,11 +75,62 @@ async function main() {
     skipDuplicates: true,
   });
 
+  // --- Restó: salones, servicios y disponibilidad de ejemplo ---
+  const salonesResto = [
+    { nombre: "Restó", mesas: 30, capacidadPersonas: 105 },
+    { nombre: "Salón Mahatma", mesas: 100, capacidadPersonas: 300 },
+    { nombre: "Sala Francisco", mesas: 20, capacidadPersonas: 60 },
+  ];
+
+  const salonesCreados = [];
+  for (const s of salonesResto) {
+    const salon = await prisma.salonResto.upsert({
+      where: { nombre: s.nombre },
+      update: {},
+      create: s,
+    });
+    salonesCreados.push(salon);
+  }
+
+  const serviciosResto = ["DESAYUNO", "ALMUERZO", "MERIENDA", "CENA"];
+  const serviciosCreados = [];
+  for (const nombre of serviciosResto) {
+    const servicio = await prisma.servicioResto.upsert({
+      where: { nombre },
+      update: {},
+      create: { nombre },
+    });
+    serviciosCreados.push(servicio);
+  }
+
+  // Disponibilidad de ejemplo: los tres salones habilitados para todos los
+  // servicios durante los próximos 14 días, para poder probar el flujo de
+  // reserva del huésped sin tener que configurar nada a mano primero.
+  const hoy = new Date();
+  const disponibilidadData = [];
+  for (let i = 0; i < 14; i++) {
+    const fecha = new Date(hoy);
+    fecha.setUTCDate(hoy.getUTCDate() + i);
+    fecha.setUTCHours(0, 0, 0, 0);
+
+    for (const salon of salonesCreados) {
+      for (const servicio of serviciosCreados) {
+        disponibilidadData.push({ salonId: salon.id, servicioId: servicio.id, fecha, habilitado: true });
+      }
+    }
+  }
+
+  await prisma.disponibilidadSalonResto.createMany({
+    data: disponibilidadData,
+    skipDuplicates: true,
+  });
+
   console.log("Seed completado. Usuarios de prueba (password: password123):");
   console.log("  admin@eleton.com (ADMIN)");
   console.log("  juan.perez@eleton.com (RECREADOR)");
   console.log("  huesped@demo.com (HUESPED)");
   console.log(`  ${agenda.length} actividades de la agenda de viernes a domingo`);
+  console.log(`  ${salonesCreados.length} salones de Restó, ${serviciosCreados.length} servicios y disponibilidad para los próximos 14 días`);
 }
 
 main()

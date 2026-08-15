@@ -1,75 +1,12 @@
+// Recreación Eleton — esquema de base de datos
+// Basado en el documento de requerimientos: Usuario, Actividad, Inscripción, Instructor
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-}
-
-model Usuario {
-  id                 String        @id @default(uuid())
-  nombre             String
-  apellido           String
-  email              String        @unique
-  passwordHash       String
-  habitacion         String?
-  telefono           String?
-  rol                Rol           @default(HUESPED)
-  creadoEn           DateTime      @default(now())
-  actividadesCreadas Actividad[]   @relation("ActividadesCreadasPor")
-  inscripciones      Inscripcion[]
-
-  @@map("usuarios")
-}
-
-model Instructor {
-  id          String      @id @default(uuid())
-  nombre      String
-  apellido    String
-  telefono    String?
-  email       String?
-  actividades Actividad[]
-
-  @@map("instructores")
-}
-
-model Actividad {
-  id            String          @id @default(uuid())
-  nombre        String
-  descripcion   String
-  categoria     Categoria
-  imagenUrl     String?
-  fecha         DateTime
-  horaInicio    String
-  horaFin       String
-  lugar         String
-  edadMinima    Int
-  edadMaxima    Int
-  cupoMaximo    Int
-  estado        EstadoActividad @default(ABIERTA)
-  creadoEn      DateTime        @default(now())
-  instructorId  String?
-  creadaPorId   String?
-  creadaPor     Usuario?        @relation("ActividadesCreadasPor", fields: [creadaPorId], references: [id])
-  instructor    Instructor?     @relation(fields: [instructorId], references: [id])
-  inscripciones Inscripcion[]
-
-  @@unique([fecha, horaInicio, categoria, nombre])
-  @@map("actividades")
-}
-
-model Inscripcion {
-  id               String            @id @default(uuid())
-  usuarioId        String
-  actividadId      String
-  fechaInscripcion DateTime          @default(now())
-  estado           EstadoInscripcion @default(CONFIRMADA)
-  asistio          Boolean           @default(false)
-  actividad        Actividad         @relation(fields: [actividadId], references: [id])
-  usuario          Usuario           @relation(fields: [usuarioId], references: [id])
-
-  @@unique([usuarioId, actividadId])
-  @@map("inscripciones")
 }
 
 enum Rol {
@@ -95,4 +32,154 @@ enum EstadoInscripcion {
   CONFIRMADA
   LISTA_ESPERA
   CANCELADA
+}
+
+model Usuario {
+  id            String    @id @default(uuid())
+  nombre        String
+  apellido      String
+  email         String    @unique
+  passwordHash  String
+  habitacion    String?
+  telefono      String?
+  rol           Rol       @default(HUESPED)
+  creadoEn      DateTime  @default(now())
+
+  actividadesCreadas Actividad[]    @relation("ActividadesCreadasPor")
+  inscripciones      Inscripcion[]
+  reservasResto      ReservaResto[] @relation("ReservasResto")
+
+  @@map("usuarios")
+}
+
+model Instructor {
+  id         String      @id @default(uuid())
+  nombre     String
+  apellido   String
+  telefono   String?
+  email      String?
+  actividades Actividad[]
+
+  @@map("instructores")
+}
+
+model Actividad {
+  id            String          @id @default(uuid())
+  nombre        String
+  descripcion   String
+  categoria     Categoria
+  imagenUrl     String?
+  fecha         DateTime
+  horaInicio    String          // "15:00"
+  horaFin       String          // "16:00"
+  lugar         String
+  edadMinima    Int
+  edadMaxima    Int
+  cupoMaximo    Int
+  estado        EstadoActividad @default(ABIERTA)
+  creadoEn      DateTime        @default(now())
+
+  instructorId  String?
+  instructor    Instructor?     @relation(fields: [instructorId], references: [id])
+
+  creadaPorId   String?
+  creadaPor     Usuario?        @relation("ActividadesCreadasPor", fields: [creadaPorId], references: [id])
+
+  inscripciones Inscripcion[]
+
+  @@unique([fecha, horaInicio, categoria, nombre])
+  @@map("actividades")
+}
+
+model Inscripcion {
+  id               String            @id @default(uuid())
+  usuarioId        String
+  usuario          Usuario           @relation(fields: [usuarioId], references: [id])
+  actividadId      String
+  actividad        Actividad         @relation(fields: [actividadId], references: [id])
+  fechaInscripcion DateTime          @default(now())
+  estado           EstadoInscripcion @default(CONFIRMADA)
+  asistio          Boolean           @default(false)
+
+  // Regla de negocio: un huésped no puede inscribirse dos veces a la misma actividad
+  @@unique([usuarioId, actividadId])
+  @@map("inscripciones")
+}
+
+// ============================================================
+// Módulo Restó — reservas de mesa, salones y disponibilidad.
+// Independiente de Recreación: no toca Actividad/Inscripcion.
+// ============================================================
+
+enum ServicioRestoNombre {
+  DESAYUNO
+  ALMUERZO
+  MERIENDA
+  CENA
+}
+
+enum EstadoReservaResto {
+  CONFIRMADA
+  CANCELADA
+  COMPLETADA
+}
+
+model SalonResto {
+  id                String   @id @default(uuid())
+  nombre            String   @unique
+  mesas             Int
+  capacidadPersonas Int
+  activo            Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  disponibilidades DisponibilidadSalonResto[]
+  reservas         ReservaResto[]
+
+  @@map("salones_resto")
+}
+
+model ServicioResto {
+  id     String              @id @default(uuid())
+  nombre ServicioRestoNombre @unique
+  activo Boolean             @default(true)
+
+  disponibilidades DisponibilidadSalonResto[]
+  reservas         ReservaResto[]
+
+  @@map("servicios_resto")
+}
+
+// Habilita/deshabilita un salón para un servicio en una fecha puntual.
+// La configura exclusivamente el administrador; el huésped nunca la ve.
+model DisponibilidadSalonResto {
+  id         String        @id @default(uuid())
+  salonId    String
+  salon      SalonResto    @relation(fields: [salonId], references: [id])
+  servicioId String
+  servicio   ServicioResto @relation(fields: [servicioId], references: [id])
+  fecha      DateTime
+  habilitado Boolean       @default(true)
+
+  @@unique([salonId, servicioId, fecha])
+  @@map("disponibilidad_salon_resto")
+}
+
+model ReservaResto {
+  id         String             @id @default(uuid())
+  nombre     String
+  habitacion String
+  personas   Int
+  fecha      DateTime
+  servicioId String
+  servicio   ServicioResto      @relation(fields: [servicioId], references: [id])
+  salonId    String
+  salon      SalonResto         @relation(fields: [salonId], references: [id])
+  estado     EstadoReservaResto @default(CONFIRMADA)
+  usuarioId  String?
+  usuario    Usuario?           @relation("ReservasResto", fields: [usuarioId], references: [id])
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+
+  @@map("reservas_resto")
 }
