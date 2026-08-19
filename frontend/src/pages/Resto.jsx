@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ExternalLink, UtensilsCrossed } from "lucide-react";
+import { ExternalLink, UtensilsCrossed, Home, CalendarCheck } from "lucide-react";
 import PublicLayout from "../components/PublicLayout";
 
 const RESTO_URL = "https://eletonresort.github.io/eletonresto/";
@@ -23,8 +23,12 @@ export default function Resto() {
                 </p>
 
                 <div className="spa-hero-actions">
+                    <Link to="/resto/reservar" className="btn-primary spa-whatsapp-btn">
+                        <CalendarCheck size={16} />
+                        Reservar mesa
+                    </Link>
                     <a
-                        className="btn-primary spa-whatsapp-btn"
+                        className="btn-ghost"
                         href={RESTO_URL}
                         target="_blank"
                         rel="noreferrer"
@@ -52,6 +56,10 @@ export default function Resto() {
                     />
                 </div>
             </section>
+
+            <Link to="/" className="resto-home-fab" aria-label="Volver al inicio">
+                <Home size={20} />
+            </Link>
         </PublicLayout>
     );
 }

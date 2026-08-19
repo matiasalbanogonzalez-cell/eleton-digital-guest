@@ -1,4 +1,3 @@
-console.log("### restoRoutes.js CARGADO ###");
 const { Router } = require("express");
 const ctrl = require("../controllers/restoController");
 const { requiereAuth, requiereRol } = require("../middleware/auth");
@@ -7,6 +6,7 @@ const router = Router();
 
 // --- Público: flujo de reserva del huésped (sin login, igual que Recreación) ---
 router.get("/servicios", ctrl.listarServicios);
+router.get("/horarios", ctrl.listarHorarios);
 router.get("/disponibilidad", ctrl.consultarDisponibilidad);
 router.post("/reservas", ctrl.crearReserva);
 

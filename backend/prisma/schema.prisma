@@ -146,8 +146,24 @@ model ServicioResto {
 
   disponibilidades DisponibilidadSalonResto[]
   reservas         ReservaResto[]
+  horarios         HorarioResto[]
 
   @@map("servicios_resto")
+}
+
+// Horarios puntuales dentro de un servicio (ej: Cena a las 21:00 y a las 22:00).
+// Opcional: un servicio sin horarios cargados se reserva sin elegir hora puntual.
+model HorarioResto {
+  id         String        @id @default(uuid())
+  servicioId String
+  servicio   ServicioResto @relation(fields: [servicioId], references: [id])
+  hora       String
+  activo     Boolean       @default(true)
+
+  reservas ReservaResto[]
+
+  @@unique([servicioId, hora])
+  @@map("horarios_resto")
 }
 
 // Habilita/deshabilita un salón para un servicio en una fecha puntual.
@@ -173,6 +189,8 @@ model ReservaResto {
   fecha      DateTime
   servicioId String
   servicio   ServicioResto      @relation(fields: [servicioId], references: [id])
+  horarioId  String?
+  horario    HorarioResto?      @relation(fields: [horarioId], references: [id])
   salonId    String
   salon      SalonResto         @relation(fields: [salonId], references: [id])
   estado     EstadoReservaResto @default(CONFIRMADA)

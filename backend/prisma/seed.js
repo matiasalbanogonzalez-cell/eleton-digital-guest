@@ -103,6 +103,18 @@ async function main() {
     serviciosCreados.push(servicio);
   }
 
+  // Horarios puntuales: por ahora solo la Cena tiene dos turnos fijos.
+  const cena = serviciosCreados.find((s) => s.nombre === "CENA");
+  const horariosCenaCreados = [];
+  for (const hora of ["21:00", "22:00"]) {
+    const horario = await prisma.horarioResto.upsert({
+      where: { servicioId_hora: { servicioId: cena.id, hora } },
+      update: {},
+      create: { servicioId: cena.id, hora },
+    });
+    horariosCenaCreados.push(horario);
+  }
+
   // Disponibilidad de ejemplo: los tres salones habilitados para todos los
   // servicios durante los próximos 14 días, para poder probar el flujo de
   // reserva del huésped sin tener que configurar nada a mano primero.
@@ -130,7 +142,7 @@ async function main() {
   console.log("  juan.perez@eleton.com (RECREADOR)");
   console.log("  huesped@demo.com (HUESPED)");
   console.log(`  ${agenda.length} actividades de la agenda de viernes a domingo`);
-  console.log(`  ${salonesCreados.length} salones de Restó, ${serviciosCreados.length} servicios y disponibilidad para los próximos 14 días`);
+  console.log(`  ${salonesCreados.length} salones de Restó, ${serviciosCreados.length} servicios (con ${horariosCenaCreados.length} horarios de Cena) y disponibilidad para los próximos 14 días`);
 }
 
 main()

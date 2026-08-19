@@ -38,10 +38,10 @@ function fechaISO(date) {
     return date.toISOString().slice(0, 10);
 }
 
-// Busca, entre los salones habilitados para ese servicio/fecha, el primero
-// (de menor a mayor capacidad, para no "gastar" el salón más grande en un
-// grupo chico) que tenga mesa libre y espacio para la cantidad de personas.
-async function encontrarSalonDisponible(tx, { fecha, servicioId, personas }) {
+// Busca, entre los salones habilitados para ese servicio/fecha(/horario), el
+// primero (de menor a mayor capacidad, para no "gastar" el salón más grande
+// en un grupo chico) que tenga mesa libre y espacio para la cantidad de personas.
+async function encontrarSalonDisponible(tx, { fecha, servicioId, horarioId, personas }) {
     const fechaDia = inicioDia(fecha);
 
     const habilitados = await tx.disponibilidadSalonResto.findMany({
@@ -56,7 +56,7 @@ async function encontrarSalonDisponible(tx, { fecha, servicioId, personas }) {
 
     for (const salon of salonesHabilitados) {
         const reservasActuales = await tx.reservaResto.findMany({
-            where: { salonId: salon.id, servicioId, fecha: fechaDia, estado: "CONFIRMADA" },
+            where: { salonId: salon.id, servicioId, horarioId: horarioId || null, fecha: fechaDia, estado: "CONFIRMADA" },
         });
 
         const personasReservadas = reservasActuales.reduce((acc, r) => acc + r.personas, 0);
@@ -73,6 +73,36 @@ async function encontrarSalonDisponible(tx, { fecha, servicioId, personas }) {
     return null;
 }
 
+// Suma, entre los salones habilitados para ese servicio/fecha(/horario), los
+// lugares que todavía se pueden ocupar (solo cuenta salones con mesa libre;
+// un salón sin mesas libres aporta 0 aunque le "sobre" capacidad de personas).
+async function calcularLugaresDisponibles(tx, { fecha, servicioId, horarioId }) {
+    const fechaDia = inicioDia(fecha);
+
+    const habilitados = await tx.disponibilidadSalonResto.findMany({
+        where: { servicioId, fecha: fechaDia, habilitado: true },
+        include: { salon: true },
+    });
+
+    const salonesHabilitados = habilitados.map((d) => d.salon).filter((s) => s.activo);
+
+    let total = 0;
+    for (const salon of salonesHabilitados) {
+        const reservasActuales = await tx.reservaResto.findMany({
+            where: { salonId: salon.id, servicioId, horarioId: horarioId || null, fecha: fechaDia, estado: "CONFIRMADA" },
+        });
+
+        const personasReservadas = reservasActuales.reduce((acc, r) => acc + r.personas, 0);
+        const mesasUsadas = reservasActuales.length;
+
+        if (mesasUsadas < salon.mesas) {
+            total += Math.max(0, salon.capacidadPersonas - personasReservadas);
+        }
+    }
+
+    return total;
+}
+
 // =========================
 // PÚBLICO — flujo del huésped
 // =========================
@@ -85,8 +115,22 @@ async function listarServicios(req, res) {
     res.json(servicios);
 }
 
+// Horarios puntuales de un servicio (ej: Cena → 21:00 / 22:00). Si el
+// servicio no tiene horarios cargados, devuelve un array vacío: el frontend
+// interpreta eso como "este servicio se reserva sin elegir hora puntual".
+async function listarHorarios(req, res) {
+    const { servicioId } = req.query;
+    if (!servicioId) return res.status(400).json({ error: "servicioId es obligatorio." });
+
+    const horarios = await prisma.horarioResto.findMany({
+        where: { servicioId, activo: true },
+        orderBy: { hora: "asc" },
+    });
+    res.json(horarios);
+}
+
 async function consultarDisponibilidad(req, res) {
-    const { fecha, servicioId, personas } = req.query;
+    const { fecha, servicioId, horarioId, personas } = req.query;
 
     if (!fecha || !servicioId || !personas) {
         return res.status(400).json({ error: "fecha, servicioId y personas son obligatorios." });
@@ -97,14 +141,17 @@ async function consultarDisponibilidad(req, res) {
         return res.status(400).json({ error: "Cantidad de personas inválida." });
     }
 
-    const salon = await encontrarSalonDisponible(prisma, { fecha, servicioId, personas: personasNumero });
-    res.json({ disponible: !!salon });
+    const [salon, lugaresDisponibles] = await Promise.all([
+        encontrarSalonDisponible(prisma, { fecha, servicioId, horarioId, personas: personasNumero }),
+        calcularLugaresDisponibles(prisma, { fecha, servicioId, horarioId }),
+    ]);
+    res.json({ disponible: !!salon, lugaresDisponibles });
 }
 
 // Caso: reservar mesa. El huésped nunca elige el salón: se asigna automáticamente
 // entre los habilitados por el administrador para ese servicio/fecha.
 async function crearReserva(req, res) {
-    const { servicioId, fecha, personas, nombre, habitacion } = req.body;
+    const { servicioId, horarioId, fecha, personas, nombre, habitacion } = req.body;
     const personasNumero = Number(personas);
 
     if (!servicioId || !fecha || !personas) {
@@ -146,7 +193,16 @@ async function crearReserva(req, res) {
                 throw error;
             }
 
-            const salon = await encontrarSalonDisponible(tx, { fecha, servicioId, personas: personasNumero });
+            if (horarioId) {
+                const horario = await tx.horarioResto.findUnique({ where: { id: horarioId } });
+                if (!horario || !horario.activo || horario.servicioId !== servicioId) {
+                    const error = new Error("El horario elegido no está disponible.");
+                    error.status = 404;
+                    throw error;
+                }
+            }
+
+            const salon = await encontrarSalonDisponible(tx, { fecha, servicioId, horarioId, personas: personasNumero });
             if (!salon) {
                 const error = new Error("No hay disponibilidad para esta fecha y horario.");
                 error.status = 409;
@@ -160,10 +216,11 @@ async function crearReserva(req, res) {
                     personas: personasNumero,
                     fecha: inicioDia(fecha),
                     servicioId,
+                    horarioId: horarioId || null,
                     salonId: salon.id,
                     usuarioId,
                 },
-                include: { servicio: true, salon: true },
+                include: { servicio: true, salon: true, horario: true },
             });
         });
 
@@ -213,7 +270,7 @@ async function listarReservas(req, res) {
 
     const reservas = await prisma.reservaResto.findMany({
         where,
-        include: { servicio: true, salon: true },
+        include: { servicio: true, salon: true, horario: true },
         orderBy: { createdAt: "desc" },
     });
 
@@ -336,6 +393,7 @@ async function actualizarConfigDisponibilidad(req, res) {
 
 module.exports = {
     listarServicios,
+    listarHorarios,
     consultarDisponibilidad,
     crearReserva,
     panelResumen,

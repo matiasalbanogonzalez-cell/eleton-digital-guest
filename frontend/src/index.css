@@ -1654,6 +1654,233 @@ body.menu-open {
   transform: translateY(0) scale(0.95);
 }
 
+/* --- Reserva de mesa (wizard huésped) --- */
+.resto-progress {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.resto-progress-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  transition: background 0.16s ease, transform 0.16s ease;
+}
+
+.resto-progress-dot.is-active {
+  background: var(--gold);
+  transform: scale(1.15);
+}
+
+.resto-reserva-section {
+  padding-bottom: 48px;
+}
+
+.resto-step-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 22px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.resto-step-loading {
+  color: var(--paper-2);
+  opacity: 0.7;
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+.resto-servicio-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.resto-servicio-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 16px 10px;
+  color: var(--paper);
+  font-family: 'DM Sans';
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+}
+
+.resto-servicio-btn:hover {
+  transform: translateY(-2px);
+  border-color: rgba(216, 164, 57, 0.4);
+}
+
+.resto-servicio-btn:active {
+  transform: translateY(0) scale(0.97);
+}
+
+.resto-horario-grid {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.resto-horario-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 10px 16px;
+  color: var(--paper);
+  font-family: 'IBM Plex Mono';
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+}
+
+.resto-horario-btn:hover {
+  border-color: rgba(216, 164, 57, 0.4);
+}
+
+.resto-horario-btn.is-selected {
+  background: rgba(216, 164, 57, 0.16);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.resto-step-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.resto-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin: 22px 0;
+}
+
+.resto-stepper-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: transparent;
+  color: var(--paper);
+  font-size: 20px;
+  cursor: pointer;
+  transition: background 0.16s ease, border-color 0.16s ease;
+}
+
+.resto-stepper-btn:hover {
+  background: rgba(216, 164, 57, 0.14);
+  border-color: var(--gold);
+}
+
+.resto-stepper-value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--paper);
+  font-family: 'Bebas Neue';
+  font-size: 28px;
+  letter-spacing: 0.02em;
+  min-width: 50px;
+  justify-content: center;
+}
+
+.resto-error {
+  color: #E8968A;
+  font-size: 12.5px;
+  margin-top: 10px;
+}
+
+.resto-disponibilidad-msg {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  font-size: 13.5px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.resto-disponibilidad-msg.is-ok {
+  background: rgba(31, 122, 77, 0.16);
+  color: #6FCF9C;
+}
+
+.resto-disponibilidad-msg.is-error {
+  background: rgba(178, 58, 46, 0.16);
+  color: #E8968A;
+}
+
+.resto-confirm-form {
+  margin-top: 16px;
+}
+
+.resto-confirm-card {
+  text-align: center;
+}
+
+.resto-confirm-check {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(31, 122, 77, 0.16);
+  color: #6FCF9C;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 14px;
+}
+
+.resto-confirm-summary {
+  margin: 18px 0;
+  text-align: left;
+}
+
+.resto-confirm-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+}
+
+.resto-confirm-row:last-child {
+  border-bottom: none;
+}
+
+.resto-confirm-row p {
+  margin: 0;
+  color: var(--paper);
+  font-weight: 600;
+  font-size: 13.5px;
+}
+
+.resto-confirm-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
 /* --- Footer público --- */
 .site-footer {
   padding: 38px 0 48px;

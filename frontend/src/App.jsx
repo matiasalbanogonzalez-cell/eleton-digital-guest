@@ -10,6 +10,8 @@ import PanelRecreador from "./pages/PanelRecreador";
 import Spa from "./pages/Spa";
 import Hotel from "./pages/Hotel";
 import Resto from "./pages/Resto";
+import ReservaResto from "./pages/ReservaResto";
+import PanelResto from "./pages/PanelResto";
 import RutaProtegida from "./components/RutaProtegida";
 import { MODULOS } from "./constants/modulos";
 
@@ -47,6 +49,15 @@ export default function App() {
 
       {/* Módulo Restó — carta y reservas embebidas */}
       <Route path="/resto" element={<Resto />} />
+      <Route path="/resto/reservar" element={<ReservaResto />} />
+      <Route
+        path="/resto/panel"
+        element={
+          <RutaProtegida rolesPermitidos={["ADMIN"]}>
+            <PanelResto />
+          </RutaProtegida>
+        }
+      />
 
       {/* Módulos todavía no desarrollados: página placeholder profesional */}
       {MODULOS.filter((m) => !m.activo).map((m) => (
