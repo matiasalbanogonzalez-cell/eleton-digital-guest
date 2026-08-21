@@ -38,21 +38,47 @@ function fechaISO(date) {
     return date.toISOString().slice(0, 10);
 }
 
+// Si el servicio tiene horarios puntuales activos (hoy en día, solo Cena),
+// exige que el pedido incluya horarioId — evita que una reserva de Cena se
+// cree "suelta" (horarioId null) y quede fuera de los cupos de 21:00/22:00.
+async function validarHorarioRequerido(tx, { servicioId, horarioId }) {
+    const horariosDelServicio = await tx.horarioResto.count({ where: { servicioId, activo: true } });
+    if (horariosDelServicio > 0 && !horarioId) {
+        const error = new Error("Este servicio requiere elegir un horario.");
+        error.status = 400;
+        throw error;
+    }
+}
+
+// Devuelve los salones activos "efectivamente" habilitados para un
+// servicio/fecha: si el admin nunca configuró explícitamente ese salón para
+// esa fecha, se asume habilitado por defecto (mismo criterio que ya usa
+// obtenerConfigDisponibilidad para el panel admin — antes esta función exigía
+// una fila explícita, así que cualquier fecha sin configurar a mano quedaba
+// sin salones disponibles, incluidas todas las fechas fuera de la ventana que
+// carga el seed).
+async function salonesHabilitadosParaFecha(tx, { fecha, servicioId }) {
+    const fechaDia = inicioDia(fecha);
+
+    const [salonesActivos, configuraciones] = await Promise.all([
+        tx.salonResto.findMany({ where: { activo: true } }),
+        tx.disponibilidadSalonResto.findMany({ where: { servicioId, fecha: fechaDia } }),
+    ]);
+
+    const mapaConfig = new Map(configuraciones.map((c) => [c.salonId, c.habilitado]));
+
+    return salonesActivos.filter((s) => (mapaConfig.has(s.id) ? mapaConfig.get(s.id) : true));
+}
+
 // Busca, entre los salones habilitados para ese servicio/fecha(/horario), el
 // primero (de menor a mayor capacidad, para no "gastar" el salón más grande
 // en un grupo chico) que tenga mesa libre y espacio para la cantidad de personas.
 async function encontrarSalonDisponible(tx, { fecha, servicioId, horarioId, personas }) {
     const fechaDia = inicioDia(fecha);
 
-    const habilitados = await tx.disponibilidadSalonResto.findMany({
-        where: { servicioId, fecha: fechaDia, habilitado: true },
-        include: { salon: true },
-    });
-
-    const salonesHabilitados = habilitados
-        .map((d) => d.salon)
-        .filter((s) => s.activo)
-        .sort((a, b) => a.capacidadPersonas - b.capacidadPersonas);
+    const salonesHabilitados = (await salonesHabilitadosParaFecha(tx, { fecha, servicioId })).sort(
+        (a, b) => a.capacidadPersonas - b.capacidadPersonas
+    );
 
     for (const salon of salonesHabilitados) {
         const reservasActuales = await tx.reservaResto.findMany({
@@ -79,12 +105,7 @@ async function encontrarSalonDisponible(tx, { fecha, servicioId, horarioId, pers
 async function calcularLugaresDisponibles(tx, { fecha, servicioId, horarioId }) {
     const fechaDia = inicioDia(fecha);
 
-    const habilitados = await tx.disponibilidadSalonResto.findMany({
-        where: { servicioId, fecha: fechaDia, habilitado: true },
-        include: { salon: true },
-    });
-
-    const salonesHabilitados = habilitados.map((d) => d.salon).filter((s) => s.activo);
+    const salonesHabilitados = await salonesHabilitadosParaFecha(tx, { fecha, servicioId });
 
     let total = 0;
     for (const salon of salonesHabilitados) {
@@ -141,6 +162,12 @@ async function consultarDisponibilidad(req, res) {
         return res.status(400).json({ error: "Cantidad de personas inválida." });
     }
 
+    try {
+        await validarHorarioRequerido(prisma, { servicioId, horarioId });
+    } catch (err) {
+        return res.status(err.status || 500).json({ error: err.message });
+    }
+
     const [salon, lugaresDisponibles] = await Promise.all([
         encontrarSalonDisponible(prisma, { fecha, servicioId, horarioId, personas: personasNumero }),
         calcularLugaresDisponibles(prisma, { fecha, servicioId, horarioId }),
@@ -192,6 +219,8 @@ async function crearReserva(req, res) {
                 error.status = 404;
                 throw error;
             }
+
+            await validarHorarioRequerido(tx, { servicioId, horarioId });
 
             if (horarioId) {
                 const horario = await tx.horarioResto.findUnique({ where: { id: horarioId } });
