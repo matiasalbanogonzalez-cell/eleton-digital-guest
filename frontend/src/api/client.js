@@ -281,4 +281,91 @@ export const api = {
       token,
     }),
 
+  // =========================
+  // SPA
+  // =========================
+
+  listarHorariosSpa: (fecha, personasAdultos, personasNinos) => {
+    const params = new URLSearchParams({ fecha, personasAdultos, personasNinos: personasNinos || 0 });
+    return request(`/spa/horarios?${params.toString()}`);
+  },
+
+  crearReservaSpa: (payload) => request("/spa/reservas", { method: "POST", body: payload }),
+
+  panelSpa: (token, fecha) => request(`/spa/panel${fecha ? `?fecha=${fecha}` : ""}`, { token }),
+  listarReservasSpa: (token, filtros = {}) => {
+    const params = new URLSearchParams();
+    Object.entries(filtros).forEach(([k, v]) => { if (v) params.set(k, v); });
+    const query = params.toString();
+    return request(`/spa/reservas${query ? `?${query}` : ""}`, { token });
+  },
+  cancelarReservaSpa: (token, id) => request(`/spa/reservas/${id}/cancelar`, { method: "PATCH", token }),
+
+  listarTemporadasSpa: (token) => request("/spa/temporadas", { token }),
+  crearTemporadaSpa: (token, payload) => request("/spa/temporadas", { method: "POST", body: payload, token }),
+  editarTemporadaSpa: (token, id, payload) => request(`/spa/temporadas/${id}`, { method: "PUT", body: payload, token }),
+  eliminarTemporadaSpa: (token, id) => request(`/spa/temporadas/${id}`, { method: "DELETE", token }),
+
+  listarHorarioBaseSpa: (token) => request("/spa/horario-base", { token }),
+  guardarHorarioBaseSpa: (token, payload) => request("/spa/horario-base", { method: "PUT", body: payload, token }),
+
+  listarRestriccionesNinosSpa: (token) => request("/spa/restricciones-ninos", { token }),
+  crearRestriccionNinosSpa: (token, payload) => request("/spa/restricciones-ninos", { method: "POST", body: payload, token }),
+  eliminarRestriccionNinosSpa: (token, id) => request(`/spa/restricciones-ninos/${id}`, { method: "DELETE", token }),
+
+  // =========================
+  // TEATRO
+  // =========================
+
+  listarFuncionesTeatro: (desde) => request(`/teatro/funciones${desde ? `?desde=${desde}` : ""}`),
+  crearReservaTeatro: (payload) => request("/teatro/reservas", { method: "POST", body: payload }),
+
+  panelTeatro: (token, fecha) => request(`/teatro/panel${fecha ? `?fecha=${fecha}` : ""}`, { token }),
+  listarReservasTeatro: (token, filtros = {}) => {
+    const params = new URLSearchParams();
+    Object.entries(filtros).forEach(([k, v]) => { if (v) params.set(k, v); });
+    const query = params.toString();
+    return request(`/teatro/reservas${query ? `?${query}` : ""}`, { token });
+  },
+  cancelarReservaTeatro: (token, id) => request(`/teatro/reservas/${id}/cancelar`, { method: "PATCH", token }),
+
+  listarFormatosTeatro: (token) => request("/teatro/formatos", { token }),
+  crearFormatoTeatro: (token, payload) => request("/teatro/formatos", { method: "POST", body: payload, token }),
+  editarFormatoTeatro: (token, id, payload) => request(`/teatro/formatos/${id}`, { method: "PUT", body: payload, token }),
+
+  listarFuncionesAdminTeatro: (token, fecha) => request(`/teatro/admin/funciones${fecha ? `?fecha=${fecha}` : ""}`, { token }),
+  crearFuncionTeatro: (token, payload) => request("/teatro/admin/funciones", { method: "POST", body: payload, token }),
+  editarFuncionTeatro: (token, id, payload) => request(`/teatro/admin/funciones/${id}`, { method: "PUT", body: payload, token }),
+
+  // =========================
+  // AVISOS
+  // =========================
+
+  listarAvisos: (habitacion, seccion) => {
+    const params = new URLSearchParams();
+    if (habitacion) params.set("habitacion", habitacion);
+    if (seccion) params.set("seccion", seccion);
+    const query = params.toString();
+    return request(`/avisos${query ? `?${query}` : ""}`);
+  },
+  listarZonasHotel: () => request("/avisos/zonas"),
+
+  listarAvisosAdmin: (token) => request("/avisos/admin", { token }),
+  crearAviso: (token, payload) => request("/avisos/admin", { method: "POST", body: payload, token }),
+  editarAviso: (token, id, payload) => request(`/avisos/admin/${id}`, { method: "PUT", body: payload, token }),
+  toggleActivoAviso: (token, id) => request(`/avisos/admin/${id}/estado`, { method: "PATCH", token }),
+  eliminarAviso: (token, id) => request(`/avisos/admin/${id}`, { method: "DELETE", token }),
+
+  // =========================
+  // ADMIN — dashboard central
+  // =========================
+
+  dashboardAdmin: (token, fecha) => request(`/admin/dashboard${fecha ? `?fecha=${fecha}` : ""}`, { token }),
+  todasLasReservas: (token, filtros = {}) => {
+    const params = new URLSearchParams();
+    Object.entries(filtros).forEach(([k, v]) => { if (v) params.set(k, v); });
+    const query = params.toString();
+    return request(`/admin/reservas${query ? `?${query}` : ""}`, { token });
+  },
+
 };

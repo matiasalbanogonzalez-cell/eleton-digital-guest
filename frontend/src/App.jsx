@@ -8,10 +8,17 @@ import DetalleActividad from "./pages/DetalleActividad";
 import MisActividades from "./pages/MisActividades";
 import PanelRecreador from "./pages/PanelRecreador";
 import Spa from "./pages/Spa";
+import ReservaSpa from "./pages/ReservaSpa";
+import PanelSpa from "./pages/PanelSpa";
 import Hotel from "./pages/Hotel";
 import Resto from "./pages/Resto";
 import ReservaResto from "./pages/ReservaResto";
 import PanelResto from "./pages/PanelResto";
+import Teatro from "./pages/Teatro";
+import PanelTeatro from "./pages/PanelTeatro";
+import Dashboard from "./pages/Dashboard";
+import TodasLasReservas from "./pages/TodasLasReservas";
+import PanelAvisos from "./pages/PanelAvisos";
 import RutaProtegida from "./components/RutaProtegida";
 import { MODULOS } from "./constants/modulos";
 
@@ -43,6 +50,15 @@ export default function App() {
 
       {/* Módulo Spa — público para huéspedes */}
       <Route path="/spa" element={<Spa />} />
+      <Route path="/spa/reservar" element={<ReservaSpa />} />
+      <Route
+        path="/spa/panel"
+        element={
+          <RutaProtegida rolesPermitidos={["ADMIN", "ADMIN_SPA"]}>
+            <PanelSpa />
+          </RutaProtegida>
+        }
+      />
 
       {/* Módulo Hotel — público para huéspedes */}
       <Route path="/hotel" element={<Hotel />} />
@@ -53,8 +69,45 @@ export default function App() {
       <Route
         path="/resto/panel"
         element={
-          <RutaProtegida rolesPermitidos={["ADMIN"]}>
+          <RutaProtegida rolesPermitidos={["ADMIN", "ADMIN_RESTO"]}>
             <PanelResto />
+          </RutaProtegida>
+        }
+      />
+
+      {/* Módulo Teatro — público para huéspedes */}
+      <Route path="/teatro" element={<Teatro />} />
+      <Route
+        path="/teatro/panel"
+        element={
+          <RutaProtegida rolesPermitidos={["ADMIN", "ADMIN_TEATRO"]}>
+            <PanelTeatro />
+          </RutaProtegida>
+        }
+      />
+
+      {/* Eleton Admin — dashboard central, solo ADMIN general */}
+      <Route
+        path="/admin/dashboard"
+        element={
+          <RutaProtegida rolesPermitidos={["ADMIN"]}>
+            <Dashboard />
+          </RutaProtegida>
+        }
+      />
+      <Route
+        path="/admin/reservas"
+        element={
+          <RutaProtegida rolesPermitidos={["ADMIN"]}>
+            <TodasLasReservas />
+          </RutaProtegida>
+        }
+      />
+      <Route
+        path="/admin/avisos"
+        element={
+          <RutaProtegida rolesPermitidos={["ADMIN"]}>
+            <PanelAvisos />
           </RutaProtegida>
         }
       />

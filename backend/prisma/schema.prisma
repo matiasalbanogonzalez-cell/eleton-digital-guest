@@ -12,6 +12,9 @@ datasource db {
 enum Rol {
   HUESPED
   RECREADOR
+  ADMIN_RESTO
+  ADMIN_SPA
+  ADMIN_TEATRO
   ADMIN
 }
 
@@ -48,6 +51,9 @@ model Usuario {
   actividadesCreadas Actividad[]    @relation("ActividadesCreadasPor")
   inscripciones      Inscripcion[]
   reservasResto      ReservaResto[] @relation("ReservasResto")
+  reservasSpa        ReservaSpa[]   @relation("ReservasSpa")
+  reservasTeatro     ReservaTeatro[] @relation("ReservasTeatro")
+  avisosCreados      Aviso[]        @relation("AvisosCreadosPor")
 
   @@map("usuarios")
 }
@@ -200,4 +206,177 @@ model ReservaResto {
   updatedAt  DateTime           @updatedAt
 
   @@map("reservas_resto")
+}
+
+// ============================================================
+// Avisos generales y zonas del hotel.
+// ============================================================
+
+enum PrioridadAviso {
+  BAJA
+  MEDIA
+  ALTA
+}
+
+// Agrupa habitaciones por ubicación física, para poder filtrar avisos por
+// zona. Lista explícita (no rango numérico) porque hay códigos no numéricos
+// (SB, SA en Subsuelo).
+model ZonaHotel {
+  id           String   @id @default(uuid())
+  nombre       String   @unique
+  habitaciones String[]
+
+  avisos Aviso[]
+
+  @@map("zonas_hotel")
+}
+
+model Aviso {
+  id              String         @id @default(uuid())
+  titulo          String
+  mensaje         String
+  fechaInicio     DateTime
+  fechaFin        DateTime
+  activo          Boolean        @default(true)
+  prioridad       PrioridadAviso @default(MEDIA)
+  seccionAfectada String?
+  zonas           ZonaHotel[]
+  creadoPorId     String
+  creadoPor       Usuario        @relation("AvisosCreadosPor", fields: [creadoPorId], references: [id])
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@map("avisos")
+}
+
+// ============================================================
+// Módulo Spa — Circuito Hídrico: temporadas, horarios, turnos,
+// restricciones para niños y reservas. Independiente de Restó/Recreación.
+// ============================================================
+
+model TemporadaSpa {
+  id           String   @id @default(uuid())
+  nombre       String
+  fechaInicio  DateTime
+  fechaFin     DateTime
+  horaApertura String
+  horaCierre   String
+  activo       Boolean  @default(true)
+
+  @@map("temporadas_spa")
+}
+
+// Horario "normal" fuera de temporada alta.
+model HorarioBaseSpa {
+  id           String @id @default(uuid())
+  diaSemana    Int    // 0=domingo … 6=sábado
+  horaApertura String
+  horaCierre   String
+
+  @@unique([diaSemana])
+  @@map("horario_base_spa")
+}
+
+// Ventanas horarias en las que se permite ingresar con niños.
+model RestriccionNinosSpa {
+  id         String  @id @default(uuid())
+  horaInicio String
+  horaFin    String
+  activo     Boolean @default(true)
+
+  @@map("restriccion_ninos_spa")
+}
+
+model TurnoSpa {
+  id              String   @id @default(uuid())
+  fecha           DateTime
+  horaInicio      String
+  horaFin         String
+  capacidadMaxima Int      @default(25)
+
+  reservas ReservaSpa[]
+
+  @@unique([fecha, horaInicio])
+  @@map("turnos_spa")
+}
+
+enum EstadoReservaSpa {
+  CONFIRMADA
+  CANCELADA
+  COMPLETADA
+}
+
+model ReservaSpa {
+  id              String           @id @default(uuid())
+  nombre          String
+  habitacion      String
+  turnoId         String
+  turno           TurnoSpa         @relation(fields: [turnoId], references: [id])
+  personasAdultos Int              @default(1)
+  personasNinos   Int              @default(0)
+  estado          EstadoReservaSpa @default(CONFIRMADA)
+  usuarioId       String?
+  usuario         Usuario?         @relation("ReservasSpa", fields: [usuarioId], references: [id])
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@map("reservas_spa")
+}
+
+// ============================================================
+// Módulo Teatro — funciones, formatos de sala y reservas.
+// Independiente de Restó/Recreación/Spa.
+// ============================================================
+
+model FormatoSalaTeatro {
+  id     String  @id @default(uuid())
+  nombre String  @unique
+  aforo  Int
+  activo Boolean @default(true)
+
+  funciones FuncionTeatro[]
+
+  @@map("formatos_sala_teatro")
+}
+
+enum EstadoFuncion {
+  PROGRAMADA
+  CANCELADA
+  FINALIZADA
+}
+
+model FuncionTeatro {
+  id            String            @id @default(uuid())
+  espectaculo   String
+  fecha         DateTime
+  hora          String
+  formatoSalaId String
+  formatoSala   FormatoSalaTeatro @relation(fields: [formatoSalaId], references: [id])
+  estado        EstadoFuncion     @default(PROGRAMADA)
+  createdAt     DateTime          @default(now())
+
+  reservas ReservaTeatro[]
+
+  @@unique([fecha, hora])
+  @@map("funciones_teatro")
+}
+
+enum EstadoReservaTeatro {
+  CONFIRMADA
+  CANCELADA
+}
+
+model ReservaTeatro {
+  id         String              @id @default(uuid())
+  nombre     String
+  habitacion String
+  funcionId  String
+  funcion    FuncionTeatro       @relation(fields: [funcionId], references: [id])
+  personas   Int
+  estado     EstadoReservaTeatro @default(CONFIRMADA)
+  usuarioId  String?
+  usuario    Usuario?            @relation("ReservasTeatro", fields: [usuarioId], references: [id])
+  createdAt  DateTime            @default(now())
+
+  @@map("reservas_teatro")
 }

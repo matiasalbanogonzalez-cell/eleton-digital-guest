@@ -1,4 +1,3 @@
-console.log("### INDEX.JS TOP - ARCHIVO CORRECTO ###");
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
@@ -8,6 +7,10 @@ const authRoutes = require("./routes/authRoutes");
 const actividadRoutes = require("./routes/actividadRoutes");
 const inscripcionRoutes = require("./routes/inscripcionRoutes");
 const restoRoutes = require("./routes/restoRoutes");
+const spaRoutes = require("./routes/spaRoutes");
+const teatroRoutes = require("./routes/teatroRoutes");
+const avisoRoutes = require("./routes/avisoRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 const app = express();
 
@@ -21,6 +24,10 @@ app.use("/api/auth", authRoutes);
 app.use("/api/actividades", actividadRoutes);
 app.use("/api/inscripciones", inscripcionRoutes);
 app.use("/api/resto", restoRoutes);
+app.use("/api/spa", spaRoutes);
+app.use("/api/teatro", teatroRoutes);
+app.use("/api/avisos", avisoRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Manejo de rutas no encontradas
 app.use((req, res) => res.status(404).json({ error: "Ruta no encontrada." }));

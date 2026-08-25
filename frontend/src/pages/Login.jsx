@@ -28,8 +28,16 @@ export default function Login() {
       guardarSesion(data);
 
       // Redirección según el rol
-      if (data.usuario.rol === "RECREADOR" || data.usuario.rol === "ADMIN") {
+      if (data.usuario.rol === "ADMIN") {
+        navigate("/admin/dashboard");
+      } else if (data.usuario.rol === "RECREADOR") {
         navigate("/recreacion/panel");
+      } else if (data.usuario.rol === "ADMIN_RESTO") {
+        navigate("/resto/panel");
+      } else if (data.usuario.rol === "ADMIN_SPA") {
+        navigate("/spa/panel");
+      } else if (data.usuario.rol === "ADMIN_TEATRO") {
+        navigate("/teatro/panel");
       } else {
         navigate("/recreacion");
       }

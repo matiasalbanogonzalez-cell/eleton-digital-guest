@@ -31,6 +31,33 @@ async function main() {
     },
   });
 
+  await prisma.usuario.upsert({
+    where: { email: "resto@eleton.com" },
+    update: {},
+    create: {
+      nombre: "Lucía", apellido: "Fernández", email: "resto@eleton.com",
+      passwordHash, rol: "ADMIN_RESTO",
+    },
+  });
+
+  await prisma.usuario.upsert({
+    where: { email: "spa@eleton.com" },
+    update: {},
+    create: {
+      nombre: "Carla", apellido: "Ibáñez", email: "spa@eleton.com",
+      passwordHash, rol: "ADMIN_SPA",
+    },
+  });
+
+  await prisma.usuario.upsert({
+    where: { email: "teatro@eleton.com" },
+    update: {},
+    create: {
+      nombre: "Diego", apellido: "Ramos", email: "teatro@eleton.com",
+      passwordHash, rol: "ADMIN_TEATRO",
+    },
+  });
+
   let instructor = await prisma.instructor.findFirst({
     where: { email: "juan.perez@eleton.com" },
   });
@@ -141,8 +168,109 @@ async function main() {
   console.log("  admin@eleton.com (ADMIN)");
   console.log("  juan.perez@eleton.com (RECREADOR)");
   console.log("  huesped@demo.com (HUESPED)");
+  console.log("  resto@eleton.com (ADMIN_RESTO)");
+  console.log("  spa@eleton.com (ADMIN_SPA)");
+  console.log("  teatro@eleton.com (ADMIN_TEATRO)");
   console.log(`  ${agenda.length} actividades de la agenda de viernes a domingo`);
   console.log(`  ${salonesCreados.length} salones de Restó, ${serviciosCreados.length} servicios (con ${horariosCenaCreados.length} horarios de Cena) y disponibilidad para los próximos 14 días`);
+
+  // --- Zonas del hotel (para filtrar avisos por ubicación) ---
+  const zonasData = [
+    { nombre: "Subsuelo", habitaciones: [...Array.from({ length: 16 }, (_, i) => String(i + 1)), "SB", "SA"] },
+    { nombre: "Planta Baja", habitaciones: Array.from({ length: 41 - 17 + 1 }, (_, i) => String(i + 17)) },
+    { nombre: "Primer Piso", habitaciones: Array.from({ length: 179 - 142 + 1 }, (_, i) => String(i + 142)) },
+    { nombre: "Segundo Piso", habitaciones: Array.from({ length: 227 - 201 + 1 }, (_, i) => String(i + 201)) },
+  ];
+  const zonasCreadas = [];
+  for (const z of zonasData) {
+    const zona = await prisma.zonaHotel.upsert({ where: { nombre: z.nombre }, update: {}, create: z });
+    zonasCreadas.push(zona);
+  }
+
+  // Aviso de ejemplo, visible para todos (sin zonas asignadas)
+  await prisma.aviso.upsert({
+    where: { id: "00000000-0000-0000-0000-000000000001" },
+    update: {},
+    create: {
+      id: "00000000-0000-0000-0000-000000000001",
+      titulo: "Bienvenidos a Eleton",
+      mensaje: "Disfrutá tu estadía. Cualquier consulta, comunicate con Guest Service al interno 2243.",
+      fechaInicio: new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate()),
+      fechaFin: new Date(hoy.getFullYear(), hoy.getMonth() + 1, hoy.getDate()),
+      prioridad: "BAJA",
+      creadoPorId: admin.id,
+    },
+  });
+
+  console.log(`  ${zonasCreadas.length} zonas del hotel y 1 aviso de ejemplo`);
+
+  // --- Spa: horario base, restricciones para niños ---
+  const horarioBaseData = [
+    { diaSemana: 0, horaApertura: "09:00", horaCierre: "21:00" }, // domingo
+    { diaSemana: 1, horaApertura: "09:00", horaCierre: "20:00" }, // lunes
+    { diaSemana: 2, horaApertura: "09:00", horaCierre: "20:00" }, // martes
+    { diaSemana: 3, horaApertura: "09:00", horaCierre: "20:00" }, // miércoles
+    { diaSemana: 4, horaApertura: "09:00", horaCierre: "20:00" }, // jueves
+    { diaSemana: 5, horaApertura: "09:00", horaCierre: "21:00" }, // viernes
+    { diaSemana: 6, horaApertura: "09:00", horaCierre: "21:00" }, // sábado
+  ];
+  for (const h of horarioBaseData) {
+    await prisma.horarioBaseSpa.upsert({ where: { diaSemana: h.diaSemana }, update: {}, create: h });
+  }
+
+  const restriccionesNinosData = [
+    { horaInicio: "10:00", horaFin: "14:00" },
+    { horaInicio: "19:00", horaFin: "23:00" },
+  ];
+  for (const r of restriccionesNinosData) {
+    const existe = await prisma.restriccionNinosSpa.findFirst({ where: { horaInicio: r.horaInicio, horaFin: r.horaFin } });
+    if (!existe) await prisma.restriccionNinosSpa.create({ data: r });
+  }
+
+  // Temporada de ejemplo (verano), para que se pueda ver el mecanismo funcionando
+  const temporadaVerano = await prisma.temporadaSpa.findFirst({ where: { nombre: "Verano (ejemplo)" } });
+  if (!temporadaVerano) {
+    await prisma.temporadaSpa.create({
+      data: {
+        nombre: "Verano (ejemplo)",
+        fechaInicio: new Date(`${hoy.getFullYear()}-12-01T00:00:00.000Z`),
+        fechaFin: new Date(`${hoy.getFullYear() + 1}-03-31T00:00:00.000Z`),
+        horaApertura: "09:00",
+        horaCierre: "21:00",
+      },
+    });
+  }
+
+  console.log("  Horario base del Spa (7 días), 2 restricciones para niños, 1 temporada de ejemplo");
+
+  // --- Teatro: formatos de sala y una función de ejemplo ---
+  const formatosData = [
+    { nombre: "Auditorio", aforo: 120 },
+    { nombre: "Teatro Bar", aforo: 60 },
+    { nombre: "Teatro Concert", aforo: 80 },
+  ];
+  const formatosCreados = [];
+  for (const f of formatosData) {
+    const formato = await prisma.formatoSalaTeatro.upsert({ where: { nombre: f.nombre }, update: {}, create: f });
+    formatosCreados.push(formato);
+  }
+
+  const funcionEjemploFecha = new Date(hoy);
+  funcionEjemploFecha.setUTCDate(hoy.getUTCDate() + 3);
+  funcionEjemploFecha.setUTCHours(0, 0, 0, 0);
+
+  await prisma.funcionTeatro.upsert({
+    where: { fecha_hora: { fecha: funcionEjemploFecha, hora: "21:30" } },
+    update: {},
+    create: {
+      espectaculo: "Noche de Humor",
+      fecha: funcionEjemploFecha,
+      hora: "21:30",
+      formatoSalaId: formatosCreados[0].id,
+    },
+  });
+
+  console.log(`  ${formatosCreados.length} formatos de sala de Teatro y 1 función de ejemplo`);
 }
 
 main()

@@ -26,9 +26,9 @@ export const MODULOS = [
     path: "/teatro",
     label: "Teatro",
     emoji: "🎭",
-    activo: false,
+    activo: true,
     tagline: "Shows y espectáculos en vivo",
-    proximamente: "Cartelera de funciones y reserva de tu lugar en la sala.",
+    proximamente: null,
   },
   {
     id: "spa",

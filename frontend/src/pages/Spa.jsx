@@ -55,14 +55,17 @@ export default function Spa() {
                 </p>
 
                 <div className="spa-hero-actions">
+                    <Link to="/spa/reservar" className="btn-primary spa-whatsapp-btn">
+                        Reservar circuito hídrico
+                    </Link>
                     <a
-                        className="btn-primary spa-whatsapp-btn"
+                        className="btn-ghost spa-whatsapp-btn"
                         href="https://wa.me/5493517677652?text=Hola%2C+quiero+reservar+un+turno+en+el+Spa"
                         target="_blank"
                         rel="noreferrer"
                     >
                         <MessageCircle size={16} />
-                        Reservar turno por WhatsApp
+                        Reservar por WhatsApp
                     </a>
                     <a
                         className="btn-ghost"

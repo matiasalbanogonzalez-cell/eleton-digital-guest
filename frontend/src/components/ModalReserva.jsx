@@ -1,122 +1,48 @@
-import { useState } from "react";
-import { api } from "../api/client";
+import { Link } from "react-router-dom";
+import { Building2, Sparkles, Theater, Droplet, Coffee, PartyPopper, ChevronRight } from "lucide-react";
 
-export default function ModalReserva({ actividad, cerrar }) {
+const ICONS = {
+  hotel: Building2,
+  recreacion: Sparkles,
+  teatro: Theater,
+  spa: Droplet,
+  resto: Coffee,
+  eventos: PartyPopper,
+};
 
-  const [form, setForm] = useState({
-    nombre: "",
-    habitacion: "",
-    edad: ""
-  });
+// Identidad de color por módulo: acento sólido (ícono + borde) y su
+// variante suave (fondo del ícono). Coherente con la paleta cálida de Eleton.
+const ACCENTS = {
+  hotel: { solid: "#96703E", soft: "#EFE6D3" },
+  recreacion: { solid: "#C97C4D", soft: "#F5E1D3" },
+  teatro: { solid: "#7A3B36", soft: "#EEDAD8" },
+  spa: { solid: "#4F7A6C", soft: "#DCEAE5" },
+  resto: { solid: "#B8862F", soft: "#F2E6CC" },
+  eventos: { solid: "#4A6670", soft: "#DCE6E8" },
+};
 
-  const [mensaje, setMensaje] = useState("");
-  const [error, setError] = useState("");
-
-  async function reservar(e) {
-    e.preventDefault();
-
-    try {
-
-      const respuesta = await api.inscribirse({
-        actividadId: actividad.id,
-        nombre: form.nombre,
-        habitacion: form.habitacion,
-        edad: form.edad
-      });
-
-      setMensaje(
-        respuesta.estado === "LISTA_ESPERA"
-        ? "Actividad completa. Quedaste en lista de espera."
-        : "Reserva confirmada."
-      );
-
-    } catch(err) {
-      setError(err.message);
-    }
-  }
-
+export default function ModuleCard({ modulo }) {
+  const Icon = ICONS[modulo.id] || Sparkles;
+  const accent = ACCENTS[modulo.id] || { solid: "var(--gold)", soft: "var(--paper-2)" };
 
   return (
+    <Link
+      to={modulo.path}
+      className={`module-card ${modulo.activo ? "is-active" : ""}`}
+      style={{ "--accent": accent.solid, "--accent-soft": accent.soft }}
+    >
+      <span className="module-card-icon">
+        <Icon size={21} strokeWidth={2} />
+      </span>
 
-    <div className="modal-overlay">
+      <span className="module-card-text">
+        <span className="module-card-label">{modulo.label}</span>
+        <span className="module-card-tagline">{modulo.tagline}</span>
+      </span>
 
-      <div className="modal-reserva">
-
-        <button 
-          className="modal-cerrar"
-          onClick={cerrar}
-        >
-          ✕
-        </button>
-
-
-        <h2>
-          Reservar
-        </h2>
-
-        <h3>
-          {actividad.nombre}
-        </h3>
-
-
-        {!mensaje ? (
-
-          <form onSubmit={reservar}>
-
-            <input
-              placeholder="Nombre"
-              value={form.nombre}
-              onChange={(e)=>setForm({
-                ...form,
-                nombre:e.target.value
-              })}
-            />
-
-
-            <input
-              placeholder="Habitación"
-              value={form.habitacion}
-              onChange={(e)=>setForm({
-                ...form,
-                habitacion:e.target.value
-              })}
-            />
-
-
-            <input
-              type="number"
-              placeholder="Edad"
-              value={form.edad}
-              onChange={(e)=>setForm({
-                ...form,
-                edad:e.target.value
-              })}
-            />
-
-
-            <button className="btn-confirmar">
-              Confirmar reserva
-            </button>
-
-
-          </form>
-
-        ) : (
-
-          <p>{mensaje}</p>
-
-        )}
-
-
-        {error && (
-          <p className="error">
-            {error}
-          </p>
-        )}
-
-      </div>
-
-    </div>
-
+      <span className="module-card-end">
+        <ChevronRight size={18} className="module-card-chevron" />
+      </span>
+    </Link>
   );
 }
