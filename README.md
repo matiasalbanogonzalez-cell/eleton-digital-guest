@@ -65,13 +65,7 @@ La API queda disponible en `http://localhost:4000/api`. Podés verificarla con:
 curl http://localhost:4000/api/health
 ```
 
-### Usuarios de prueba (password: `password123`)
 
-| Email                     | Rol        |
-|---------------------------|------------|
-| admin@eleton.com          | ADMIN      |
-| juan.perez@eleton.com     | RECREADOR  |
-| huesped@demo.com          | HUESPED    |
 
 ### Endpoints principales
 
