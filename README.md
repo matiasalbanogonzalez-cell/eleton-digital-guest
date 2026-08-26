@@ -34,7 +34,7 @@ cp .env.example .env
 Editá `.env` y poné tu cadena de conexión real, por ejemplo (si usaste el comando de Docker de arriba):
 
 ```
-DATABASE_URL="postgresql://postgres:password@localhost:5432/recreacion_eleton?schema=public"
+DATABASE_URL="schema=public"
 JWT_SECRET="alguna-clave-larga-y-aleatoria"
 PORT=4000
 CORS_ORIGIN="http://localhost:5173"
