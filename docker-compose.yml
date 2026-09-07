@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: eleton-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: recreacion_eleton
+    ports:
+      - "5432:5432"
+    volumes:
+      - eleton_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  eleton_postgres_data:
