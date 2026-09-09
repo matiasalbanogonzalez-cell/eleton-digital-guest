@@ -13,14 +13,14 @@ export default function Footer() {
 
       <div className="footer-columns">
         <div>
-          <h3>Contacto</h3>
-          <p>Recepción disponible 24/7 desde tu habitación.</p>
+          <h3>Desarrolado por</h3>
+          <p>devtry</p>
         </div>
         <div>
           <h3>Ubicación</h3>
           <p>
             <MapPin size={14} />
-            &nbsp;Hotel Eleton · Costa del Sol
+            &nbsp;Hotel Eleton · Villa Carlos Paz, Córdoba, Argentina
           </p>
           <p>
             <Mail size={14} />

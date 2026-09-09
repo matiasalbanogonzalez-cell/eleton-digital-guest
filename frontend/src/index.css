@@ -1,4 +1,4 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
 :root {
@@ -17,7 +17,7 @@
   --cat-adultos: #5B4B8A;
   --cat-adultos-soft: #E2DCEF;
 
-  /* --- Tokens de sistema (Fase 1.5): sombras cálidas, radios y transición base --- */
+  /* --- Tokens de sistema (Fase 1.5): sombras cÃ¡lidas, radios y transiciÃ³n base --- */
   --shadow-color: 18, 12, 8;
   --shadow-sm: 0 2px 10px rgba(var(--shadow-color), 0.14);
   --shadow-md: 0 10px 28px rgba(var(--shadow-color), 0.18);
@@ -533,7 +533,7 @@ body {
   font-weight: 700;
 }
 
-/* Sistema tipográfico unificado: Inter para toda la interfaz. */
+/* Sistema tipogrÃ¡fico unificado: Inter para toda la interfaz. */
 .agenda-date {
   margin: 0 0 20px;
   color: var(--paper);
@@ -691,15 +691,15 @@ body {
 
 
 /* ============================================================
-   ELETON DIGITAL GUEST — sistema visual público (plataforma)
+   ELETON DIGITAL GUEST â€” sistema visual pÃºblico (plataforma)
    Extiende los mismos tokens (--ink, --gold, --paper) que ya
-   usa Recreación, para que todo se sienta del mismo hotel.
+   usa RecreaciÃ³n, para que todo se sienta del mismo hotel.
 
-   Jerarquía de z-index de esta sección:
-     contenido normal   -> automático (flujo del documento)
+   JerarquÃ­a de z-index de esta secciÃ³n:
+     contenido normal   -> automÃ¡tico (flujo del documento)
      navbar (sticky)    -> 20
-     backdrop del menú  -> 90
-     menú lateral fixed -> 100
+     backdrop del menÃº  -> 90
+     menÃº lateral fixed -> 100
    ============================================================ */
 
 .site {
@@ -723,7 +723,7 @@ body {
   flex: 1;
 }
 
-/* --- Navbar pública --- */
+/* --- Navbar pÃºblica --- */
 .navbar {
   width: 100%;
   max-width: 1180px;
@@ -844,7 +844,7 @@ body {
   transform: translateY(-1px);
 }
 
-/* --- Menú lateral (drawer) --- */
+/* --- MenÃº lateral (drawer) --- */
 .nav-drawer-overlay {
   position: fixed;
   inset: 0;
@@ -980,7 +980,7 @@ body {
   font-weight: 700;
 }
 
-/* --- Cuando el menú está abierto, bloquear scroll del body ---
+/* --- Cuando el menÃº estÃ¡ abierto, bloquear scroll del body ---
    La clase se aplica/quita desde MobileNavigation, nunca de forma
    permanente en `body`, para no romper el scroll del resto del sitio. */
 body.menu-open {
@@ -1046,18 +1046,18 @@ body.menu-open {
   margin-top: 28px;
   padding: 26px 22px;
   border-radius: var(--radius-lg);
-  background: rgba(9, 24, 21, 0.55);
-  border: 1px solid rgba(251, 246, 234, 0.14);
+  background:
+    linear-gradient(165deg, rgba(9, 24, 21, 0.28) 0%, rgba(9, 24, 21, 0.78) 72%, rgba(9, 24, 21, 0.94) 100%),
+    url("/images/modules/hotel.jpg") center 68% / cover no-repeat;
+  border: 1px solid rgba(251, 246, 234, 0.16);
   box-shadow: var(--shadow-lg);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  min-height: 160px;
+  min-height: 200px;
   display: flex;
   align-items: flex-end;
 }
 
-/* Decorativo: un resplandor difuso detrás del contenido de la card.
-   `position:absolute` es apropiado acá porque es puramente
+/* Decorativo: un resplandor difuso detrÃ¡s del contenido de la card.
+   `position:absolute` es apropiado acÃ¡ porque es puramente
    decorativo y no contiene texto ni participa del flujo. */
 .hero-image-glow {
   position: absolute;
@@ -1094,7 +1094,7 @@ body.menu-open {
   max-width: 380px;
 }
 
-/* --- Encabezados de sección (reutilizable) --- */
+/* --- Encabezados de secciÃ³n (reutilizable) --- */
 .section-row {
   display: flex;
   flex-wrap: wrap;
@@ -1134,7 +1134,7 @@ body.menu-open {
   max-width: 480px;
 }
 
-/* --- Grilla de módulos --- */
+/* --- Grilla de mÃ³dulos --- */
 .module-section {
   padding-bottom: 40px;
 }
@@ -1155,12 +1155,28 @@ body.menu-open {
   width: 100%;
   min-height: 138px;
   padding: 18px 16px 16px;
-  background: var(--paper);
+  overflow: hidden;
+  background: linear-gradient(155deg, #FFFDF7 0%, var(--paper) 46%, var(--paper-2) 100%);
   border-radius: var(--radius-md);
-  border: 1px solid rgba(18, 56, 50, 0.06);
+  border: 1px solid rgba(18, 56, 50, 0.07);
   text-decoration: none;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.65);
   transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease), border-color 0.2s var(--ease);
+}
+
+/* Resplandor sutil con el color del modulo, se intensifica en hover */
+.module-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(130px 100px at 90% -12%, var(--accent-soft, transparent), transparent 72%);
+  opacity: 0.85;
+  transition: opacity 0.2s var(--ease);
+  pointer-events: none;
+}
+
+.module-card:hover::before {
+  opacity: 1;
 }
 
 .module-card.is-active {
@@ -1345,7 +1361,7 @@ body.menu-open {
   display: block;
 }
 
-/* --- Información rápida --- */
+/* --- InformaciÃ³n rÃ¡pida --- */
 .info-section {
   padding-bottom: 48px;
 }
@@ -1400,7 +1416,7 @@ body.menu-open {
   font-size: 13.5px;
 }
 
-/* --- Placeholder de módulo --- */
+/* --- Placeholder de mÃ³dulo --- */
 .placeholder-hero {
   padding: 24px 0 60px 0;
   text-align: center;
@@ -1447,7 +1463,7 @@ body.menu-open {
   margin: 0 auto;
 }
 
-/* --- Página Spa --- */
+/* --- PÃ¡gina Spa --- */
 .spa-hero-title {
   font-size: clamp(34px, 6vw, 50px);
 }
@@ -1565,7 +1581,7 @@ body.menu-open {
   font-size: 13.5px;
 }
 
-/* --- Página Hotel --- */
+/* --- PÃ¡gina Hotel --- */
 .hotel-hero .hero-title {
   font-size: clamp(34px, 6vw, 50px);
 }
@@ -1704,7 +1720,7 @@ body.menu-open {
   margin: 0;
 }
 
-/* --- Página Restó (embed externo) --- */
+/* --- PÃ¡gina RestÃ³ (embed externo) --- */
 .resto-embed-section {
   padding-bottom: 48px;
 }
@@ -1768,7 +1784,7 @@ body.menu-open {
   transform: translateY(0) scale(0.95);
 }
 
-/* --- Reserva de mesa (wizard huésped) --- */
+/* --- Reserva de mesa (wizard huÃ©sped) --- */
 .resto-progress {
   display: flex;
   justify-content: center;
@@ -1840,6 +1856,18 @@ body.menu-open {
 
 .resto-servicio-btn:active {
   transform: translateY(0) scale(0.97);
+}
+
+.resto-servicio-btn.is-selected {
+  background: rgba(216, 164, 57, 0.16);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.resto-servicio-btn.is-selected {
+  background: rgba(216, 164, 57, 0.16);
+  border-color: var(--gold);
+  color: var(--gold);
 }
 
 .resto-horario-grid {
@@ -1997,7 +2025,7 @@ body.menu-open {
   text-decoration: none;
 }
 
-/* --- Footer público --- */
+/* --- Footer pÃºblico --- */
 .site-footer {
   padding: 38px 0 48px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -2102,7 +2130,7 @@ body.menu-open {
   }
 
   .info-compact {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     min-width: 0;
   }
 
@@ -2251,7 +2279,7 @@ body.menu-open {
   transform: scale(.95);
 
 }
-/* --- Banner de Avisos (visible en todos los módulos con PublicLayout) --- */
+/* --- Banner de Avisos (visible en todos los mÃ³dulos con PublicLayout) --- */
 .aviso-banner-stack {
   max-width: 1180px;
   margin: 0 auto;
@@ -2298,3 +2326,7 @@ body.menu-open {
   padding: 2px;
 }
 .aviso-banner-close:hover { opacity: 1; }
+
+
+
+

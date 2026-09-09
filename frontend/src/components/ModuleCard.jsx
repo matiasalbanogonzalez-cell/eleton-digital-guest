@@ -1,5 +1,6 @@
+
 import { Link } from "react-router-dom";
-import { Building2, Sparkles, Theater, Droplet, Coffee, Info, ChevronRight } from "lucide-react";
+import { Building2, Sparkles, Theater, Droplet, Coffee, Info, MessageSquare, ChevronRight } from "lucide-react";
 
 const ICONS = {
   hotel: Building2,
@@ -8,6 +9,7 @@ const ICONS = {
   spa: Droplet,
   resto: Coffee,
   informacion: Info,
+  sugerencias: MessageSquare,
 };
 
 // Identidad de color por módulo: acento sólido (ícono + borde) y su
@@ -19,6 +21,7 @@ const ACCENTS = {
   spa: { solid: "#4F7A6C", soft: "#DCEAE5" },
   resto: { solid: "#B8862F", soft: "#F2E6CC" },
   informacion: { solid: "#4A6670", soft: "#DCE6E8" },
+  sugerencias: { solid: "#3F7D6B", soft: "#DCEEE6" },
 };
 
 export default function ModuleCard({ modulo }) {

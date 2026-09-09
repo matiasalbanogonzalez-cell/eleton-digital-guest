@@ -1,5 +1,7 @@
-﻿import { useState } from "react";
-import { MessageSquare, Smile, AlertTriangle, Wrench, HelpCircle, Star, Send, CheckCircle2 } from "lucide-react";
+﻿
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { MessageSquare, Smile, AlertTriangle, Wrench, HelpCircle, Star, Send, CheckCircle2, Home } from "lucide-react";
 import PublicLayout from "../components/PublicLayout";
 import { api } from "../api/client";
 
@@ -64,29 +66,40 @@ export default function Sugerencias() {
   if (enviado) {
     return (
       <PublicLayout>
-        <div className="mx-auto max-w-lg py-16 px-4 text-center">
-          <CheckCircle2 className="mx-auto mb-4 text-[#4F7A6C]" size={48} />
-          <h1 className="text-2xl font-bold text-[#123832]">¡Gracias por tu mensaje!</h1>
-          <p className="mt-2 text-[#123832]/70">
-            Lo recibimos y lo va a revisar el equipo correspondiente.
-          </p>
-        </div>
+        <section className="resto-reserva-section" style={{ paddingTop: 24 }}>
+          <div className="resto-step-card resto-confirm-card">
+            <div className="resto-confirm-check">
+              <CheckCircle2 size={40} />
+            </div>
+            <h2 className="section-title font-display">¡Gracias por tu mensaje!</h2>
+            <p className="section-title-sub" style={{ margin: "8px auto 0" }}>
+              Lo recibimos y lo va a revisar el equipo correspondiente de Eleton.
+            </p>
+            <Link to="/" className="btn-primary resto-confirm-btn" style={{ marginTop: 20 }}>
+              <Home size={16} />
+              Volver al inicio
+            </Link>
+          </div>
+        </section>
       </PublicLayout>
     );
   }
 
   return (
     <PublicLayout>
-      <div className="mx-auto max-w-lg py-10 px-4">
-        <h1 className="text-2xl font-bold text-[#123832]">Sugerencias y comentarios</h1>
-        <p className="mt-1 text-[#123832]/70">
-          Tu opinión nos ayuda a mejorar tu estadía.
+      <section className="placeholder-hero hotel-hero">
+        <div className="section-title-eyebrow font-mono">Sugerencias y comentarios</div>
+        <h1 className="hero-title font-display spa-hero-title">Tu opinión nos ayuda a mejorar</h1>
+        <p className="hero-sub spa-hero-sub">
+          Contanos cómo va tu estadía: sugerencias, felicitaciones o reclamos, todo suma.
         </p>
+      </section>
 
-        <form onSubmit={handleSubmit} className="mt-6 space-y-6">
-          <div>
-            <label className="mb-2 block text-sm font-semibold text-[#123832]">Tipo</label>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+      <section className="resto-reserva-section">
+        <form onSubmit={handleSubmit} className="resto-step-card">
+          <div className="form-field">
+            <label className="form-label">Tipo de mensaje</label>
+            <div className="resto-servicio-grid" style={{ gridTemplateColumns: "repeat(3, minmax(0, 1fr))" }}>
               {TIPOS.map((t) => {
                 const Icon = t.icon;
                 const activo = tipo === t.value;
@@ -95,13 +108,9 @@ export default function Sugerencias() {
                     type="button"
                     key={t.value}
                     onClick={() => setTipo(t.value)}
-                    className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm transition ${
-                      activo
-                        ? "border-[#C97C4D] bg-[#C97C4D]/10 text-[#123832] font-semibold"
-                        : "border-[#123832]/15 text-[#123832]/70 hover:border-[#123832]/30"
-                    }`}
+                    className={`resto-servicio-btn ${activo ? "is-selected" : ""}`}
                   >
-                    <Icon size={16} />
+                    <Icon size={18} />
                     {t.label}
                   </button>
                 );
@@ -109,42 +118,36 @@ export default function Sugerencias() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="mb-1 block text-sm font-semibold text-[#123832]">
-                Nombre (opcional)
-              </label>
+          <div className="detail-form-grid" style={{ marginTop: 18 }}>
+            <div className="form-field">
+              <label className="form-label">Nombre (opcional)</label>
               <input
                 type="text"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
-                className="w-full rounded-lg border border-[#123832]/20 px-3 py-2 text-sm focus:border-[#C97C4D] focus:outline-none"
+                className="form-input"
                 placeholder="Tu nombre"
               />
             </div>
-            <div>
-              <label className="mb-1 block text-sm font-semibold text-[#123832]">
-                Habitación *
-              </label>
+            <div className="form-field">
+              <label className="form-label">Habitación *</label>
               <input
                 type="text"
                 value={habitacion}
                 onChange={(e) => setHabitacion(e.target.value)}
-                className="w-full rounded-lg border border-[#123832]/20 px-3 py-2 text-sm focus:border-[#C97C4D] focus:outline-none"
+                className="form-input"
                 placeholder="Ej: 204"
                 required
               />
             </div>
           </div>
 
-          <div>
-            <label className="mb-1 block text-sm font-semibold text-[#123832]">
-              Categoría *
-            </label>
+          <div className="form-field">
+            <label className="form-label">Categoría *</label>
             <select
               value={categoria}
               onChange={(e) => setCategoria(e.target.value)}
-              className="w-full rounded-lg border border-[#123832]/20 px-3 py-2 text-sm focus:border-[#C97C4D] focus:outline-none"
+              className="form-select"
               required
             >
               <option value="">Seleccioná una categoría</option>
@@ -156,55 +159,51 @@ export default function Sugerencias() {
             </select>
           </div>
 
-          <div>
-            <label className="mb-1 block text-sm font-semibold text-[#123832]">
-              Mensaje *
-            </label>
+          <div className="form-field">
+            <label className="form-label">Mensaje *</label>
             <textarea
               value={mensaje}
               onChange={(e) => setMensaje(e.target.value)}
               rows={4}
-              className="w-full rounded-lg border border-[#123832]/20 px-3 py-2 text-sm focus:border-[#C97C4D] focus:outline-none"
+              className="form-input"
+              style={{ resize: "vertical" }}
               placeholder="Contanos qué pasó o qué se te ocurre..."
               required
             />
           </div>
 
-          <div>
-            <label className="mb-1 block text-sm font-semibold text-[#123832]">
-              Valoración (opcional)
-            </label>
-            <div className="flex gap-1">
+          <div className="form-field">
+            <label className="form-label">Valoración (opcional)</label>
+            <div style={{ display: "flex", gap: 4 }}>
               {[1, 2, 3, 4, 5].map((n) => (
                 <button
                   type="button"
                   key={n}
                   onClick={() => setValoracion(valoracion === n ? 0 : n)}
                   aria-label={`${n} estrellas`}
+                  style={{ background: "none", border: "none", cursor: "pointer", padding: 2 }}
                 >
                   <Star
                     size={26}
-                    className={n <= valoracion ? "fill-[#C97C4D] text-[#C97C4D]" : "text-[#123832]/20"}
+                    color={n <= valoracion ? "var(--gold)" : "var(--paper-2)"}
+                    fill={n <= valoracion ? "var(--gold)" : "none"}
+                    style={{ opacity: n <= valoracion ? 1 : 0.35 }}
                   />
                 </button>
               ))}
             </div>
           </div>
 
-          {error && (
-            <p className="rounded-lg bg-[#7A3B36]/10 px-3 py-2 text-sm text-[#7A3B36]">{error}</p>
-          )}
+          {error && <div className="field-error">{error}</div>}
 
-          <button
-            type="submit"
-            disabled={enviando}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#123832] py-3 font-semibold text-white transition hover:bg-[#123832]/90 disabled:opacity-60"
-          >
-            <Send size={16} />
-            {enviando ? "Enviando..." : "Enviar"}
+          <button type="submit" disabled={enviando} className="btn-primary" style={{ width: "100%", marginTop: 4 }}>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "center", width: "100%" }}>
+              <Send size={16} />
+              {enviando ? "Enviando..." : "Enviar"}
+            </span>
           </button>
         </form>
-      </div>
+      </section>
     </PublicLayout>
   );
 }

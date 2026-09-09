@@ -1,3 +1,4 @@
+
 // Catálogo central de módulos de Eleton Digital Guest.
 // Única fuente de verdad para: Home, navegación pública y páginas placeholder.
 // Agregar un módulo nuevo acá alcanza para que aparezca en toda la app.
@@ -57,6 +58,15 @@ export const MODULOS = [
     tagline: "Bodas, congresos y celebraciones",
     proximamente:
       "Salón de eventos, organización de bodas, congresos y celebraciones corporativas. Muy pronto vas a poder consultar disponibilidad desde acá.",
+  },
+  {
+    id: "sugerencias",
+    path: "/sugerencias",
+    label: "Sugerencias",
+    emoji: "💬",
+    activo: true,
+    tagline: "Contanos cómo va tu estadía",
+    proximamente: null,
   },
 ];
 

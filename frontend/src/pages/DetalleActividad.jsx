@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, CalendarDays, Clock3, MapPin, Users } from "lucide-react";
 import { api } from "../api/client";
+import PublicLayout from "../components/PublicLayout";
 import ActividadImagen from "../components/ActividadImagen";
 import { CATS } from "../constants/categorias";
 
@@ -136,11 +137,11 @@ export default function DetalleActividad() {
 
     return (
 
-      <div className="page-message">
-
-        Cargando...
-
-      </div>
+      <PublicLayout>
+        <div className="page-message" style={{ margin: "40px 0" }}>
+          Cargando...
+        </div>
+      </PublicLayout>
 
     );
 
@@ -152,11 +153,11 @@ export default function DetalleActividad() {
 
     return (
 
-      <div className="page-message">
-
-        Actividad no encontrada.
-
-      </div>
+      <PublicLayout>
+        <div className="page-message page-error" style={{ margin: "40px 0" }}>
+          Actividad no encontrada.
+        </div>
+      </PublicLayout>
 
     );
 
@@ -171,6 +172,8 @@ export default function DetalleActividad() {
 
   return (
 
+    <PublicLayout>
+    <section className="resto-reserva-section" style={{ paddingTop: 24 }}>
     <div 
       className="page-surface"
       style={{
@@ -189,7 +192,7 @@ export default function DetalleActividad() {
 
         <ArrowLeft size={16}/>
 
-        Volver a recreación
+        Volver a recreaciÃ³n
 
       </button>
 
@@ -201,11 +204,11 @@ export default function DetalleActividad() {
         <div className="reserva-exito">
 
           <h1>
-            ✓
+            âœ“
           </h1>
 
           <h2>
-            Reserva realizada con éxito
+            Reserva realizada con Ã©xito
           </h2>
 
 
@@ -215,7 +218,7 @@ export default function DetalleActividad() {
 
 
           <span>
-            Volviendo a recreación...
+            Volviendo a recreaciÃ³n...
           </span>
 
 
@@ -269,7 +272,7 @@ export default function DetalleActividad() {
 
           >
 
-            {cat.label.toUpperCase()} · {actividad.edadMinima}-{actividad.edadMaxima} años
+            {cat.label.toUpperCase()} Â· {actividad.edadMinima}-{actividad.edadMaxima} aÃ±os
 
 
           </div>
@@ -468,7 +471,7 @@ export default function DetalleActividad() {
 
               >
 
-                Completá tus datos para reservar tu lugar.
+                CompletÃ¡ tus datos para reservar tu lugar.
 
               </div>
 
@@ -517,7 +520,7 @@ export default function DetalleActividad() {
 
                 <label className="form-label">
 
-                  Habitación
+                  HabitaciÃ³n
 
                 </label>
 
@@ -648,6 +651,8 @@ export default function DetalleActividad() {
 
 
     </div>
+    </section>
+    </PublicLayout>
 
   );
 
