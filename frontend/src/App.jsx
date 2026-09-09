@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+﻿import { Navigate, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 import ModuloPlaceholder from "./pages/ModuloPlaceholder";
 import Login from "./pages/Login";
@@ -19,6 +19,7 @@ import PanelTeatro from "./pages/PanelTeatro";
 import Dashboard from "./pages/Dashboard";
 import TodasLasReservas from "./pages/TodasLasReservas";
 import PanelAvisos from "./pages/PanelAvisos";
+import Sugerencias from "./pages/Sugerencias";
 import RutaProtegida from "./components/RutaProtegida";
 import { MODULOS } from "./constants/modulos";
 
@@ -85,6 +86,9 @@ export default function App() {
           </RutaProtegida>
         }
       />
+
+      {/* Módulo Sugerencias — público para huéspedes */}
+      <Route path="/sugerencias" element={<Sugerencias />} />
 
       {/* Eleton Admin — dashboard central, solo ADMIN general */}
       <Route

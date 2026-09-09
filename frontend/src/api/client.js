@@ -1,6 +1,5 @@
-const API_URL =
+﻿const API_URL =
   import.meta.env.VITE_API_URL || "http://localhost:4000/api";
-
 
 async function request(path, { method = "GET", body, token } = {}) {
   const res = await fetch(`${API_URL}${path}`, {
@@ -14,14 +13,11 @@ async function request(path, { method = "GET", body, token } = {}) {
     body: body ? JSON.stringify(body) : undefined,
   });
 
-
   if (res.status === 204) {
     return null;
   }
 
-
   const data = await res.json().catch(() => null);
-
 
   if (!res.ok) {
     throw new Error(
@@ -29,11 +25,8 @@ async function request(path, { method = "GET", body, token } = {}) {
     );
   }
 
-
   return data;
 }
-
-
 
 export const api = {
 
@@ -41,13 +34,11 @@ export const api = {
   // AUTH
   // =========================
 
-
   registrar: (payload) =>
     request("/auth/registro", {
       method: "POST",
       body: payload,
     }),
-
 
   login: (payload) =>
     request("/auth/login", {
@@ -55,43 +46,24 @@ export const api = {
       body: payload,
     }),
 
-
   yo: (token) =>
     request("/auth/yo", {
       token,
     }),
 
-
-
   // =========================
   // ACTIVIDADES
   // =========================
 
-
-  // token -> fecha -> categoria
-  //
-  // ejemplo:
-  // listarActividades(undefined,"2026-08-07","KIDS")
-
-
   listarActividades: (token, fecha, categoria) => {
-
     const params = new URLSearchParams();
-
-
     if (fecha) {
       params.set("fecha", fecha);
     }
-
-
     if (categoria && categoria !== "TODAS") {
       params.set("categoria", categoria);
     }
-
-
     const query = params.toString();
-
-
     return request(
       `/actividades${query ? `?${query}` : ""}`,
       {
@@ -100,14 +72,10 @@ export const api = {
     );
   },
 
-
-
   obtenerActividad: (token, id) =>
     request(`/actividades/${id}`, {
       token,
     }),
-
-
 
   crearActividad: (token, payload) =>
     request("/actividades", {
@@ -116,8 +84,6 @@ export const api = {
       token,
     }),
 
-
-
   editarActividad: (token, id, payload) =>
     request(`/actividades/${id}`, {
       method: "PUT",
@@ -125,22 +91,16 @@ export const api = {
       token,
     }),
 
-
-
   cancelarActividad: (token, id) =>
     request(`/actividades/${id}/cancelar`, {
       method: "POST",
       token,
     }),
 
-
-
   listarParticipantes: (token, id) =>
     request(`/actividades/${id}/participantes`, {
       token,
     }),
-
-
 
   marcarAsistencia: (
     token,
@@ -158,23 +118,9 @@ export const api = {
       }
     ),
 
-
-
   // =========================
   // INSCRIPCIONES
   // =========================
-
-
-  // Huésped sin login
-  // recibe:
-  //
-  // {
-  // actividadId,
-  // nombre,
-  // habitacion,
-  // edad
-  // }
-
 
   inscribirse: (payload) =>
     request("/inscripciones", {
@@ -182,27 +128,21 @@ export const api = {
       body: payload,
     }),
 
-
-
   cancelarInscripcion: (token, actividadId) =>
     request(`/inscripciones/${actividadId}`, {
       method: "DELETE",
       token,
     }),
 
-
-
   misActividades: (token) =>
     request("/inscripciones/mias", {
       token,
     }),
 
-
   // =========================
   // RESTÓ
   // =========================
 
-  // Huésped — flujo de reserva
   listarServiciosResto: () =>
     request("/resto/servicios"),
 
@@ -221,7 +161,6 @@ export const api = {
       body: payload,
     }),
 
-  // Admin — panel Restó
   panelResto: (token, fecha) =>
     request(`/resto/panel${fecha ? `?fecha=${fecha}` : ""}`, {
       token,
@@ -367,5 +306,29 @@ export const api = {
     const query = params.toString();
     return request(`/admin/reservas${query ? `?${query}` : ""}`, { token });
   },
+
+  // =========================
+  // SUGERENCIAS
+  // =========================
+
+  crearSugerencia: (payload) =>
+    request("/sugerencias", {
+      method: "POST",
+      body: payload,
+    }),
+
+  listarSugerenciasAdmin: (token, filtros = {}) => {
+    const params = new URLSearchParams();
+    Object.entries(filtros).forEach(([k, v]) => { if (v) params.set(k, v); });
+    const query = params.toString();
+    return request(`/sugerencias/admin${query ? `?${query}` : ""}`, { token });
+  },
+
+  actualizarSugerencia: (token, id, payload) =>
+    request(`/sugerencias/admin/${id}`, {
+      method: "PATCH",
+      body: payload,
+      token,
+    }),
 
 };

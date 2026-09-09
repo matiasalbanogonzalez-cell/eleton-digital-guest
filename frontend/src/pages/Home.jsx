@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Coffee, LogIn, LogOut, Sparkles, UtensilsCrossed, CalendarDays, PartyPopper } from "lucide-react";
 import PublicLayout from "../components/PublicLayout";
 import ModuleCard from "../components/ModuleCard";
 import { MODULOS } from "../constants/modulos";
@@ -15,6 +16,14 @@ export default function Home() {
             divertirte y reconectar en un resort premium.
           </p>
 
+          <div className="hero-actions">
+            <Link to="/recreacion" className="btn-primary" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center" }}>
+              Ver actividades
+            </Link>
+            <Link to="/hotel" className="btn-ghost" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center" }}>
+              Información del hotel
+            </Link>
+          </div>
         </div>
 
         <div className="hero-image-card">
@@ -54,18 +63,21 @@ export default function Home() {
         <div className="featured-grid">
           <article className="featured-card featured-card-large">
             <div className="featured-card-copy">
+              <span className="featured-card-icon"><PartyPopper size={18} strokeWidth={2} /></span>
               <div className="featured-card-eyebrow font-mono">Actividad del día</div>
               <h3>Bingo Familiar</h3>
               <p>Disfrutá de una tarde de diversión con tu familia en nuestro bingo familiar.</p>
             </div>
           </article>
           <Link to="/resto" className="featured-card featured-card-link">
+            <span className="featured-card-icon"><UtensilsCrossed size={18} strokeWidth={2} /></span>
             <div className="featured-card-eyebrow font-mono">Restó</div>
             <h3>Plato del día</h3>
             <p>Sabores locales con una carta fresca y elegante para cada momento del día.</p>
             <span className="featured-card-cta">Ingresá a la carta para ver mas opciones→</span>
           </Link>
           <article className="featured-card">
+            <span className="featured-card-icon"><CalendarDays size={18} strokeWidth={2} /></span>
             <div className="featured-card-eyebrow font-mono">Eventos</div>
             <h3>Proximos Eventos</h3>
             <p>Sala Francisco</p>
@@ -83,18 +95,22 @@ export default function Home() {
           </div>
           <div className="info-compact">
             <div>
+              <span className="info-compact-icon"><Coffee size={18} strokeWidth={2} /></span>
               <span className="info-label">Desayuno</span>
               <p>de 08:00 hs a 10:30 hs</p>
             </div>
             <div>
+              <span className="info-compact-icon"><LogIn size={18} strokeWidth={2} /></span>
               <span className="info-label">Check-in</span>
               <p>16:00 hs</p>
             </div>
             <div>
+              <span className="info-compact-icon"><LogOut size={18} strokeWidth={2} /></span>
               <span className="info-label">Check-out</span>
               <p>10:00 hs</p>
             </div>
             <div>
+              <span className="info-compact-icon"><Sparkles size={18} strokeWidth={2} /></span>
               <span className="info-label">Recreación</span>
               <p>Actividades de 10:00 hs a 18:00 hs</p>
             </div>
