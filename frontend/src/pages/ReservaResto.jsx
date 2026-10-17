@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import PublicLayout from "../components/PublicLayout";
 import { api } from "../api/client";
+import { useToast } from "../context/ToastContext";
 
 const ICONOS_SERVICIO = {
     DESAYUNO: Coffee,
@@ -33,6 +34,7 @@ function hoyISO() {
 }
 
 export default function ReservaResto() {
+    const { toast } = useToast();
     const [paso, setPaso] = useState(1);
 
     // SERVICIOS
@@ -205,9 +207,13 @@ export default function ReservaResto() {
 
             setReserva(data);
             setPaso(5);
+            toast.success("Tu reserva de mesa se realizó correctamente.", {
+                title: "¡Reserva exitosa!",
+            });
         } catch (err) {
             console.error("Error confirmando reserva:", err);
             setError(err.message);
+            toast.error(err.message, { title: "Error al reservar" });
         } finally {
             setConfirmando(false);
         }

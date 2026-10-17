@@ -1,4 +1,4 @@
-﻿@import "tailwindcss";
+@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
 :root {
@@ -2326,6 +2326,177 @@ body.menu-open {
   padding: 2px;
 }
 .aviso-banner-close:hover { opacity: 1; }
+
+/* ============================================================
+   TOAST NOTIFICATIONS — Eleton Digital Guest
+   ============================================================ */
+
+.toast-container {
+  position: fixed;
+  top: 22px;
+  right: 22px;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none;
+  max-width: 420px;
+  width: calc(100vw - 32px);
+}
+
+@media (max-width: 640px) {
+  .toast-container {
+    top: 14px;
+    left: 14px;
+    right: 14px;
+    margin: 0 auto;
+    width: auto;
+    max-width: 100%;
+  }
+}
+
+.toast-item {
+  pointer-events: auto;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 16px 16px 16px;
+  border-radius: var(--radius-md, 18px);
+  background: #0d2b27;
+  background: linear-gradient(145deg, #123832 0%, #0a2420 100%);
+  color: var(--paper, #FBF6EA);
+  border: 1px solid rgba(216, 164, 57, 0.42);
+  box-shadow: 
+    0 16px 36px rgba(0, 0, 0, 0.45),
+    0 2px 10px rgba(0, 0, 0, 0.25),
+    0 0 24px rgba(216, 164, 57, 0.16);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  animation: toastEntrance 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+  user-select: none;
+}
+
+.toast-item.is-closing {
+  animation: toastExit 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes toastEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(-22px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes toastExit {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.92);
+  }
+}
+
+.toast-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(216, 164, 57, 0.16);
+  border: 1px solid rgba(216, 164, 57, 0.38);
+  color: var(--gold, #D8A439);
+}
+
+.toast-icon-wrap.toast-type-error {
+  background: rgba(232, 102, 75, 0.18);
+  border-color: rgba(232, 102, 75, 0.42);
+  color: #E8664B;
+}
+
+.toast-icon-wrap.toast-type-info {
+  background: rgba(47, 143, 135, 0.18);
+  border-color: rgba(47, 143, 135, 0.42);
+  color: #2F8F87;
+}
+
+.toast-content {
+  flex: 1;
+  min-width: 0;
+  padding-top: 1px;
+}
+
+.toast-title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 14.5px;
+  line-height: 1.25;
+  color: var(--paper, #FBF6EA);
+  letter-spacing: -0.01em;
+  margin-bottom: 4px;
+}
+
+.toast-message {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  line-height: 1.45;
+  color: rgba(251, 246, 234, 0.88);
+  word-break: break-word;
+}
+
+.toast-close-btn {
+  background: transparent;
+  border: none;
+  color: rgba(251, 246, 234, 0.55);
+  cursor: pointer;
+  padding: 5px;
+  margin: -4px -4px 0 0;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.18s ease, background 0.18s ease;
+  flex-shrink: 0;
+}
+
+.toast-close-btn:hover {
+  color: var(--paper, #FBF6EA);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* Timer progress bar */
+.toast-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  background: linear-gradient(90deg, var(--gold, #D8A439), #F5D77F);
+  box-shadow: 0 0 8px rgba(216, 164, 57, 0.5);
+  animation-name: toastProgressCountdown;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes toastProgressCountdown {
+  0% {
+    width: 100%;
+  }
+  100% {
+    width: 0%;
+  }
+}
+
 
 
 

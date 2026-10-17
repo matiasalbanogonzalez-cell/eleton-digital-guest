@@ -4,8 +4,10 @@ import { Theater, CalendarDays, Users, CheckCircle2, Home } from "lucide-react";
 import PublicLayout from "../components/PublicLayout";
 import { api } from "../api/client";
 import { setGuestIdentity } from "../utils/guestIdentity";
+import { useToast } from "../context/ToastContext";
 
 export default function Teatro() {
+  const { toast } = useToast();
   const [funciones, setFunciones] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
@@ -49,8 +51,12 @@ export default function Teatro() {
       });
       setGuestIdentity({ nombre: nombre.trim(), habitacion: habitacion.trim() });
       setReserva(data);
+      toast.success("Tu reserva para la función se confirmó correctamente.", {
+        title: "¡Reserva exitosa!",
+      });
     } catch (err) {
       setErrorReserva(err.message);
+      toast.error(err.message, { title: "Error al reservar" });
     } finally {
       setConfirmando(false);
     }

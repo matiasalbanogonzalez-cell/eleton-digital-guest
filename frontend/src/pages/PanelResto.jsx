@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 
 const SERVICIO_LABEL = { DESAYUNO: "Desayuno", ALMUERZO: "Almuerzo", MERIENDA: "Merienda", CENA: "Cena" };
 const SERVICIO_HORARIO = {
@@ -19,6 +20,7 @@ function hoyISO() {
 
 export default function PanelResto() {
     const { token } = useAuth();
+    const { toast } = useToast();
 
     const [fechaFiltro, setFechaFiltro] = useState(hoyISO());
     const [servicioFiltro, setServicioFiltro] = useState("");
@@ -68,8 +70,15 @@ export default function PanelResto() {
     useEffect(cargarTodo, [cargarTodo]);
 
     async function cancelar(id) {
-        await api.cancelarReservaResto(token, id);
-        cargarTodo();
+        try {
+            await api.cancelarReservaResto(token, id);
+            toast.success("La reserva de mesa fue cancelada correctamente.", {
+                title: "¡Reserva cancelada!",
+            });
+            cargarTodo();
+        } catch (err) {
+            toast.error(err.message, { title: "Error al cancelar reserva" });
+        }
     }
 
     function iniciarEdicion(salon) {
@@ -78,14 +87,28 @@ export default function PanelResto() {
     }
 
     async function guardarEdicion(id) {
-        await api.editarSalonResto(token, id, editForm);
-        setEditandoSalonId(null);
-        cargarTodo();
+        try {
+            await api.editarSalonResto(token, id, editForm);
+            toast.success("Los datos del salón fueron actualizados.", {
+                title: "¡Salón actualizado!",
+            });
+            setEditandoSalonId(null);
+            cargarTodo();
+        } catch (err) {
+            toast.error(err.message, { title: "Error al editar salón" });
+        }
     }
 
     async function toggleActivo(id) {
-        await api.toggleEstadoSalonResto(token, id);
-        cargarTodo();
+        try {
+            await api.toggleEstadoSalonResto(token, id);
+            toast.success("El estado del salón fue modificado.", {
+                title: "¡Estado modificado!",
+            });
+            cargarTodo();
+        } catch (err) {
+            toast.error(err.message, { title: "Error al modificar estado" });
+        }
     }
 
     async function crearSalon(e) {
@@ -93,22 +116,33 @@ export default function PanelResto() {
         setError("");
         try {
             await api.crearSalonResto(token, nuevoSalon);
+            toast.success("El salón fue creado correctamente.", {
+                title: "¡Salón creado!",
+            });
             setNuevoSalon({ nombre: "", mesas: "", capacidadPersonas: "" });
             setMostrarNuevoSalon(false);
             cargarTodo();
         } catch (err) {
             setError(err.message);
+            toast.error(err.message, { title: "Error al crear salón" });
         }
     }
 
     async function toggleDisponibilidad(item) {
-        await api.actualizarConfigDisponibilidadResto(token, {
-            salonId: item.salonId,
-            servicioId: item.servicioId,
-            fecha: fechaFiltro,
-            habilitado: !item.habilitado,
-        });
-        cargarTodo();
+        try {
+            await api.actualizarConfigDisponibilidadResto(token, {
+                salonId: item.salonId,
+                servicioId: item.servicioId,
+                fecha: fechaFiltro,
+                habilitado: !item.habilitado,
+            });
+            toast.success("La disponibilidad del servicio fue actualizada.", {
+                title: "¡Disponibilidad actualizada!",
+            });
+            cargarTodo();
+        } catch (err) {
+            toast.error(err.message, { title: "Error al actualizar disponibilidad" });
+        }
     }
 
     const cardStyle = { background: "var(--paper)", borderRadius: 12, padding: "12px 14px", marginBottom: 10 };

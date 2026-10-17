@@ -3,11 +3,13 @@ import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import BarraSuperior from "../components/BarraSuperior";
 import { CATS } from "../constants/categorias";
+import { useToast } from "../context/ToastContext";
 
 const CATEGORIAS = ["KIDS", "ADOLESCENTES", "ADULTOS"];
 
 export default function PanelRecreador() {
   const { token } = useAuth();
+  const { toast } = useToast();
 
   const [actividades, setActividades] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -60,6 +62,10 @@ export default function PanelRecreador() {
     try {
       await api.crearActividad(token, form);
 
+      toast.success("La actividad fue programada correctamente.", {
+        title: "¡Actividad creada!",
+      });
+
       setMostrarForm(false);
 
       setForm({
@@ -78,6 +84,7 @@ export default function PanelRecreador() {
       cargar();
     } catch (err) {
       setError(err.message);
+      toast.error(err.message, { title: "Error al crear actividad" });
     }
   }
 
@@ -108,6 +115,13 @@ export default function PanelRecreador() {
         !actual
       );
 
+      toast.success(
+        !actual
+          ? "Asistencia confirmada para el participante."
+          : "Asistencia desmarcada para el participante.",
+        { title: "¡Asistencia actualizada!" }
+      );
+
       const data = await api.listarParticipantes(
         token,
         participantesDe.id
@@ -116,6 +130,7 @@ export default function PanelRecreador() {
       setParticipantes(data);
     } catch (err) {
       setError(err.message);
+      toast.error(err.message, { title: "Error al registrar asistencia" });
     }
   }
 
@@ -127,12 +142,17 @@ export default function PanelRecreador() {
     try {
       await api.cancelarActividad(token, id);
 
+      toast.success("La actividad fue cancelada correctamente.", {
+        title: "¡Actividad cancelada!",
+      });
+
       setParticipantesDe(null);
       setParticipantes([]);
 
       cargar();
     } catch (err) {
       setError(err.message);
+      toast.error(err.message, { title: "Error al cancelar actividad" });
     }
   }
 

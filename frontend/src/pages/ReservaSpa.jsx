@@ -4,12 +4,14 @@ import { Users, Baby, CheckCircle2, Home, Clock } from "lucide-react";
 import PublicLayout from "../components/PublicLayout";
 import { api } from "../api/client";
 import { setGuestIdentity } from "../utils/guestIdentity";
+import { useToast } from "../context/ToastContext";
 
 function hoyISO() {
   return new Date().toISOString().slice(0, 10);
 }
 
 export default function ReservaSpa() {
+  const { toast } = useToast();
   const [paso, setPaso] = useState(1);
 
   const [adultos, setAdultos] = useState(2);
@@ -60,8 +62,12 @@ export default function ReservaSpa() {
       setGuestIdentity({ nombre: nombre.trim(), habitacion: habitacion.trim() });
       setReserva(data);
       setPaso(5);
+      toast.success("Tu turno en el Spa fue reservado correctamente.", {
+        title: "¡Reserva exitosa!",
+      });
     } catch (err) {
       setError(err.message);
+      toast.error(err.message, { title: "Error al reservar" });
     } finally {
       setConfirmando(false);
     }

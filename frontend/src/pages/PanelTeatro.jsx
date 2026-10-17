@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 
 function hoyISO() {
   return new Date().toISOString().slice(0, 10);
@@ -9,6 +10,7 @@ function hoyISO() {
 
 export default function PanelTeatro() {
   const { token } = useAuth();
+  const { toast } = useToast();
   const [seccion, setSeccion] = useState("reservas");
   const [fecha, setFecha] = useState(hoyISO());
 
@@ -41,8 +43,15 @@ export default function PanelTeatro() {
   useEffect(cargarTodo, [cargarTodo]);
 
   async function cancelar(id) {
-    await api.cancelarReservaTeatro(token, id);
-    cargarTodo();
+    try {
+      await api.cancelarReservaTeatro(token, id);
+      toast.success("La reserva para la función fue cancelada correctamente.", {
+        title: "¡Reserva cancelada!",
+      });
+      cargarTodo();
+    } catch (err) {
+      toast.error(err.message, { title: "Error al cancelar reserva" });
+    }
   }
 
   function iniciarEdicionAforo(f) {
@@ -51,9 +60,16 @@ export default function PanelTeatro() {
   }
 
   async function guardarAforo(id) {
-    await api.editarFormatoTeatro(token, id, { aforo: Number(aforoEdit) });
-    setEditandoFormatoId(null);
-    cargarTodo();
+    try {
+      await api.editarFormatoTeatro(token, id, { aforo: Number(aforoEdit) });
+      toast.success("El aforo de la sala fue actualizado correctamente.", {
+        title: "¡Aforo actualizado!",
+      });
+      setEditandoFormatoId(null);
+      cargarTodo();
+    } catch (err) {
+      toast.error(err.message, { title: "Error al actualizar aforo" });
+    }
   }
 
   async function crearFuncion(e) {
@@ -61,17 +77,28 @@ export default function PanelTeatro() {
     setError("");
     try {
       await api.crearFuncionTeatro(token, nuevaFuncion);
+      toast.success("La función teatral fue programada exitosamente.", {
+        title: "¡Función creada!",
+      });
       setNuevaFuncion({ espectaculo: "", fecha: "", hora: "", formatoSalaId: "" });
       setMostrarNuevaFuncion(false);
       cargarTodo();
     } catch (err) {
       setError(err.message);
+      toast.error(err.message, { title: "Error al crear función" });
     }
   }
 
   async function cancelarFuncion(f) {
-    await api.editarFuncionTeatro(token, f.id, { estado: "CANCELADA" });
-    cargarTodo();
+    try {
+      await api.editarFuncionTeatro(token, f.id, { estado: "CANCELADA" });
+      toast.success("La función fue cancelada correctamente.", {
+        title: "¡Función cancelada!",
+      });
+      cargarTodo();
+    } catch (err) {
+      toast.error(err.message, { title: "Error al cancelar función" });
+    }
   }
 
   const cardStyle = { background: "var(--paper)", borderRadius: 12, padding: "12px 14px", marginBottom: 10 };

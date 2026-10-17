@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 
 const DIAS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
@@ -11,6 +12,7 @@ function hoyISO() {
 
 export default function PanelSpa() {
   const { token } = useAuth();
+  const { toast } = useToast();
   const [seccion, setSeccion] = useState("reservas");
   const [fecha, setFecha] = useState(hoyISO());
 
@@ -46,8 +48,15 @@ export default function PanelSpa() {
   useEffect(cargarTodo, [cargarTodo]);
 
   async function cancelar(id) {
-    await api.cancelarReservaSpa(token, id);
-    cargarTodo();
+    try {
+      await api.cancelarReservaSpa(token, id);
+      toast.success("El turno del Spa fue cancelado correctamente.", {
+        title: "¡Reserva cancelada!",
+      });
+      cargarTodo();
+    } catch (err) {
+      toast.error(err.message, { title: "Error al cancelar turno" });
+    }
   }
 
   async function crearTemporada(e) {
@@ -55,41 +64,80 @@ export default function PanelSpa() {
     setError("");
     try {
       await api.crearTemporadaSpa(token, nuevaTemporada);
+      toast.success("La temporada de Spa fue creada correctamente.", {
+        title: "¡Temporada creada!",
+      });
       setNuevaTemporada({ nombre: "", fechaInicio: "", fechaFin: "", horaApertura: "09:00", horaCierre: "21:00" });
       setMostrarNuevaTemporada(false);
       cargarTodo();
     } catch (err) {
       setError(err.message);
+      toast.error(err.message, { title: "Error al crear temporada" });
     }
   }
 
   async function toggleTemporada(t) {
-    await api.editarTemporadaSpa(token, t.id, { activo: !t.activo });
-    cargarTodo();
+    try {
+      await api.editarTemporadaSpa(token, t.id, { activo: !t.activo });
+      toast.success("El estado de la temporada fue actualizado.", {
+        title: "¡Temporada actualizada!",
+      });
+      cargarTodo();
+    } catch (err) {
+      toast.error(err.message, { title: "Error al actualizar temporada" });
+    }
   }
 
   async function eliminarTemporada(id) {
-    await api.eliminarTemporadaSpa(token, id);
-    cargarTodo();
+    try {
+      await api.eliminarTemporadaSpa(token, id);
+      toast.success("La temporada fue eliminada correctamente.", {
+        title: "¡Temporada eliminada!",
+      });
+      cargarTodo();
+    } catch (err) {
+      toast.error(err.message, { title: "Error al eliminar temporada" });
+    }
   }
 
   async function guardarHorario(diaSemana, campo, valor) {
-    const actual = horarioBase.find((h) => h.diaSemana === diaSemana) || { horaApertura: "09:00", horaCierre: "20:00" };
-    await api.guardarHorarioBaseSpa(token, { diaSemana, ...actual, [campo]: valor });
-    cargarTodo();
+    try {
+      const actual = horarioBase.find((h) => h.diaSemana === diaSemana) || { horaApertura: "09:00", horaCierre: "20:00" };
+      await api.guardarHorarioBaseSpa(token, { diaSemana, ...actual, [campo]: valor });
+      toast.success("El horario base del Spa fue guardado.", {
+        title: "¡Horario guardado!",
+      });
+      cargarTodo();
+    } catch (err) {
+      toast.error(err.message, { title: "Error al guardar horario" });
+    }
   }
 
   async function crearRestriccion(e) {
     e.preventDefault();
     if (!nuevaRestriccion.horaInicio || !nuevaRestriccion.horaFin) return;
-    await api.crearRestriccionNinosSpa(token, nuevaRestriccion);
-    setNuevaRestriccion({ horaInicio: "", horaFin: "" });
-    cargarTodo();
+    try {
+      await api.crearRestriccionNinosSpa(token, nuevaRestriccion);
+      toast.success("La restricción horaria fue creada correctamente.", {
+        title: "¡Restricción creada!",
+      });
+      setNuevaRestriccion({ horaInicio: "", horaFin: "" });
+      cargarTodo();
+    } catch (err) {
+      toast.error(err.message, { title: "Error al crear restricción" });
+    }
   }
 
   async function eliminarRestriccion(id) {
-    await api.eliminarRestriccionNinosSpa(token, id);
-    cargarTodo();
+    try {
+      await api.eliminarRestriccionNinosSpa(token, id);
+      toast.success("La restricción fue eliminada correctamente.", {
+        title: "¡Restricción eliminada!",
+      });
+      cargarTodo();
+    } catch (err) {
+      toast.error(err.message, { title: "Error al eliminar restricción" });
+    }
   }
 
   const cardStyle = { background: "var(--paper)", borderRadius: 12, padding: "12px 14px", marginBottom: 10 };

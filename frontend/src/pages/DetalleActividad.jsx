@@ -1,15 +1,17 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, CalendarDays, Clock3, MapPin, Users } from "lucide-react";
 import { api } from "../api/client";
 import PublicLayout from "../components/PublicLayout";
 import ActividadImagen from "../components/ActividadImagen";
 import { CATS } from "../constants/categorias";
+import { useToast } from "../context/ToastContext";
 
 export default function DetalleActividad() {
 
   const { id } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const [actividad, setActividad] = useState(null);
   const [cargando, setCargando] = useState(true);
@@ -80,23 +82,22 @@ export default function DetalleActividad() {
     setError("");
     setSuccess("");
 
-
     try {
-
-
       const resultado = await api.inscribirse({
-
         actividadId: id,
-
         nombre: form.nombre.trim(),
-
         habitacion: form.habitacion.trim(),
-
         edad: Number(form.edad),
-
       });
 
+      const mensaje =
+        resultado.estado === "CONFIRMADA"
+          ? "Tu lugar en la actividad fue reservado correctamente."
+          : "Tu lugar quedó registrado en lista de espera.";
 
+      toast.success(mensaje, {
+        title: "¡Reserva exitosa!",
+      });
 
       setSuccess(
         resultado.estado === "CONFIRMADA"
@@ -104,29 +105,18 @@ export default function DetalleActividad() {
           : "Quedaste en lista de espera"
       );
 
-
       setMostrarExito(true);
 
-
-
       setTimeout(() => {
-
         navigate("/recreacion");
-
       }, 2500);
 
-
-
     } catch (err) {
-
       setError(err.message);
-
+      toast.error(err.message, { title: "Error en la reserva" });
     } finally {
-
       setProcesando(false);
-
     }
-
   }
 
 
