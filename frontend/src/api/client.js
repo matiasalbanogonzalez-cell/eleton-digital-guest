@@ -102,6 +102,12 @@ export const api = {
       token,
     }),
 
+  cancelarInscripcionesActividad: (token, inscripcionIds) =>
+    request("/actividades/inscripciones/cancelar", {
+      method: "PATCH",
+      body: { inscripcionIds },
+      token,
+    }),
   marcarAsistencia: (
     token,
     inscripcionId,

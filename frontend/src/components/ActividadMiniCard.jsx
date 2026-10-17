@@ -1,6 +1,7 @@
 import ActividadImagen from "./ActividadImagen";
 
 export default function ActividadMiniCard({ actividad, onReservar }) {
+  const cuposOcupados = actividad ? actividad.cupoMaximo - actividad.cuposDisponibles : 0;
 
   if (!actividad) {
     return (
@@ -27,6 +28,9 @@ export default function ActividadMiniCard({ actividad, onReservar }) {
 
         <span>
           {actividad.horaInicio}
+        </span>
+        <span className="actividad-mini-cupos">
+          {cuposOcupados}/{actividad.cupoMaximo} cupos
         </span>
 
         <button

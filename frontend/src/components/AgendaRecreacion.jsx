@@ -1,6 +1,8 @@
 import ActividadMiniCard from "./ActividadMiniCard";
 
-export default function AgendaRecreacion({ actividades, onReservar }) {
+const CATEGORIAS = ["KIDS", "ADOLESCENTES", "ADULTOS"];
+
+export default function AgendaRecreacion({ actividades, onReservar, categoriasVisibles = CATEGORIAS }) {
 
   const horarios = [
     ...new Set(
@@ -31,7 +33,10 @@ export default function AgendaRecreacion({ actividades, onReservar }) {
 
 
   return (
-    <div className="agenda-container">
+    <div
+      className="agenda-container"
+      style={{ "--agenda-categorias": categoriasVisibles.length }}
+    >
 
 
       <div className="agenda-header">
@@ -40,17 +45,11 @@ export default function AgendaRecreacion({ actividades, onReservar }) {
           Hora
         </div>
 
-        <div>
-          Kids
-        </div>
-
-        <div>
-          Teens
-        </div>
-
-        <div>
-          Adultos
-        </div>
+        {categoriasVisibles.map((categoria) => (
+          <div key={categoria}>
+            {categoria === "KIDS" ? "Kids" : categoria === "ADOLESCENTES" ? "Adolescentes" : "Adultos"}
+          </div>
+        ))}
 
       </div>
 
@@ -69,22 +68,13 @@ export default function AgendaRecreacion({ actividades, onReservar }) {
           </div>
 
 
-          <ActividadMiniCard
-            actividad={buscarActividad(hora, "KIDS")}
-            onReservar={onReservar}
-          />
-
-
-          <ActividadMiniCard
-            actividad={buscarActividad(hora, "ADOLESCENTES")}
-            onReservar={onReservar}
-          />
-
-
-          <ActividadMiniCard
-            actividad={buscarActividad(hora, "ADULTOS")}
-            onReservar={onReservar}
-          />
+          {categoriasVisibles.map((categoria) => (
+            <ActividadMiniCard
+              key={categoria}
+              actividad={buscarActividad(hora, categoria)}
+              onReservar={onReservar}
+            />
+          ))}
 
 
         </div>

@@ -14,8 +14,11 @@ export default function PanelRecreador() {
   const [actividades, setActividades] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [mostrarForm, setMostrarForm] = useState(false);
+  const [actividadEditando, setActividadEditando] = useState(null);
   const [participantesDe, setParticipantesDe] = useState(null);
   const [participantes, setParticipantes] = useState([]);
+  const [seleccionados, setSeleccionados] = useState([]);
+  const [confirmarEliminacion, setConfirmarEliminacion] = useState(false);
   const [cargandoParticipantes, setCargandoParticipantes] = useState(false);
   const [error, setError] = useState("");
 
@@ -32,6 +35,45 @@ export default function PanelRecreador() {
     cupoMaximo: 20,
   });
 
+  function limpiarFormulario() {
+    setForm({
+      nombre: "",
+      categoria: "KIDS",
+      descripcion: "",
+      lugar: "",
+      fecha: new Date().toISOString().slice(0, 10),
+      horaInicio: "10:00",
+      horaFin: "11:00",
+      edadMinima: 0,
+      edadMaxima: 99,
+      cupoMaximo: 20,
+    });
+  }
+
+  function abrirNuevaActividad() {
+    setActividadEditando(null);
+    limpiarFormulario();
+    setError("");
+    setMostrarForm(true);
+  }
+
+  function editarActividad(actividad) {
+    setActividadEditando(actividad);
+    setForm({
+      nombre: actividad.nombre || "",
+      categoria: actividad.categoria || "KIDS",
+      descripcion: actividad.descripcion || "",
+      lugar: actividad.lugar || "",
+      fecha: new Date(actividad.fecha).toISOString().slice(0, 10),
+      horaInicio: actividad.horaInicio || "",
+      horaFin: actividad.horaFin || "",
+      edadMinima: actividad.edadMinima ?? 0,
+      edadMaxima: actividad.edadMaxima ?? 99,
+      cupoMaximo: actividad.cupoMaximo ?? 20,
+    });
+    setError("");
+    setMostrarForm(true);
+  }
   function cargar() {
     setCargando(true);
     setError("");
@@ -55,41 +97,38 @@ export default function PanelRecreador() {
     };
   }
 
-  async function crear(e) {
+  async function guardarActividad(e) {
     e.preventDefault();
     setError("");
 
     try {
-      await api.crearActividad(token, form);
-
-      toast.success("La actividad fue programada correctamente.", {
-        title: "¡Actividad creada!",
-      });
+      if (actividadEditando) {
+        await api.editarActividad(token, actividadEditando.id, form);
+        toast.success("Los cambios se guardaron correctamente.", {
+          title: "Actividad actualizada",
+        });
+      } else {
+        await api.crearActividad(token, form);
+        toast.success("La actividad fue programada correctamente.", {
+          title: "Actividad creada",
+        });
+      }
 
       setMostrarForm(false);
-
-      setForm({
-        nombre: "",
-        categoria: "KIDS",
-        descripcion: "",
-        lugar: "",
-        fecha: new Date().toISOString().slice(0, 10),
-        horaInicio: "10:00",
-        horaFin: "11:00",
-        edadMinima: 0,
-        edadMaxima: 99,
-        cupoMaximo: 20,
-      });
-
+      setActividadEditando(null);
+      limpiarFormulario();
       cargar();
     } catch (err) {
       setError(err.message);
-      toast.error(err.message, { title: "Error al crear actividad" });
+      toast.error(err.message, {
+        title: actividadEditando ? "Error al editar actividad" : "Error al crear actividad",
+      });
     }
   }
-
   async function verParticipantes(actividad) {
     setParticipantesDe(actividad);
+    setSeleccionados([]);
+    setConfirmarEliminacion(false);
     setCargandoParticipantes(true);
     setError("");
 
@@ -134,6 +173,43 @@ export default function PanelRecreador() {
     }
   }
 
+  function toggleSeleccion(inscripcionId) {
+    setSeleccionados((actuales) =>
+      actuales.includes(inscripcionId)
+        ? actuales.filter((id) => id !== inscripcionId)
+        : [...actuales, inscripcionId]
+    );
+  }
+
+  function toggleSeleccionarTodos() {
+    setSeleccionados((actuales) =>
+      actuales.length === participantes.length
+        ? []
+        : participantes.map((participante) => participante.id)
+    );
+  }
+
+  async function eliminarReservasSeleccionadas() {
+    if (seleccionados.length === 0) return;
+
+    const cantidad = seleccionados.length;
+
+    try {
+      await api.cancelarInscripcionesActividad(token, seleccionados);
+      const data = await api.listarParticipantes(token, participantesDe.id);
+      setParticipantes(data);
+      setSeleccionados([]);
+      setConfirmarEliminacion(false);
+      cargar();
+      toast.success(
+        cantidad === 1 ? "La reserva fue eliminada." : `${cantidad} reservas fueron eliminadas.`,
+        { title: "Reservas actualizadas" }
+      );
+    } catch (err) {
+      setError(err.message);
+      toast.error(err.message, { title: "Error al eliminar reservas" });
+    }
+  }
   async function cancelarActividad(id) {
     if (!window.confirm("¿Cancelar esta actividad?")) {
       return;
@@ -221,9 +297,14 @@ export default function PanelRecreador() {
                 fontSize: 11,
                 whiteSpace: "nowrap",
               }}
-              onClick={() =>
-                setMostrarForm(!mostrarForm)
-              }
+              onClick={() => {
+                if (mostrarForm) {
+                  setMostrarForm(false);
+                  setActividadEditando(null);
+                } else {
+                  abrirNuevaActividad();
+                }
+              }}
             >
               {mostrarForm ? "Cerrar" : "+ Nueva"}
             </button>
@@ -311,7 +392,8 @@ export default function PanelRecreador() {
 
         {mostrarForm && (
           <form
-            onSubmit={crear}
+            className="recreador-form"
+            onSubmit={guardarActividad}
             style={{
               background: "var(--paper)",
               borderRadius: 14,
@@ -326,7 +408,7 @@ export default function PanelRecreador() {
                 marginBottom: 14,
               }}
             >
-              Nueva actividad
+              {actividadEditando ? "Editar actividad" : "Nueva actividad"}
             </div>
 
             <div className="form-field">
@@ -488,7 +570,7 @@ export default function PanelRecreador() {
               style={{ width: "100%" }}
               type="submit"
             >
-              Guardar actividad
+              {actividadEditando ? "Guardar cambios" : "Guardar actividad"}
             </button>
           </form>
         )}
@@ -663,6 +745,20 @@ export default function PanelRecreador() {
                       : `Ver participantes (${inscriptos})`}
                   </button>
 
+                  {a.estado !== "CANCELADA" && (
+                    <button
+                      className="btn-ghost"
+                      style={{
+                        padding: "8px 10px",
+                        fontSize: 10.5,
+                        color: "var(--text)",
+                        borderColor: "rgba(27,43,39,0.2)",
+                      }}
+                      onClick={() => editarActividad(a)}
+                    >
+                      Editar
+                    </button>
+                  )}
                   {a.estado !==
                     "CANCELADA" && (
                       <button
@@ -730,6 +826,87 @@ export default function PanelRecreador() {
                       </div>
                     </div>
 
+                    {!cargandoParticipantes && participantes.length > 0 && (
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          gap: 8,
+                          marginBottom: 8,
+                        }}
+                      >
+                        <label style={{ fontSize: 10.5, color: "var(--text-soft)", cursor: "pointer" }}>
+                          <input
+                            type="checkbox"
+                            checked={seleccionados.length === participantes.length}
+                            onChange={toggleSeleccionarTodos}
+                            style={{ marginRight: 6 }}
+                          />
+                          Seleccionar todos
+                        </label>
+
+                        <button
+                          className="btn-ghost"
+                          disabled={seleccionados.length === 0}
+                          style={{
+                            padding: "6px 9px",
+                            fontSize: 9.5,
+                            color: "#B23A2E",
+                            borderColor: "rgba(178,58,46,0.3)",
+                            opacity: seleccionados.length === 0 ? 0.45 : 1,
+                          }}
+                          type="button"
+                          onClick={() => setConfirmarEliminacion(true)}
+                        >
+                          Eliminar ({seleccionados.length})
+                        </button>
+                      </div>
+                    )}
+
+                    {confirmarEliminacion && (
+                      <div
+                        style={{
+                          background: "#FCE8E2",
+                          border: "1px solid rgba(178,58,46,0.3)",
+                          borderRadius: 10,
+                          padding: 10,
+                          marginBottom: 10,
+                          fontSize: 11,
+                          color: "var(--text)",
+                        }}
+                      >
+                        <div style={{ marginBottom: 8 }}>
+                          {seleccionados.length === 1
+                            ? "¿Confirmás eliminar esta reserva?"
+                            : `¿Confirmás eliminar las ${seleccionados.length} reservas seleccionadas?`}
+                        </div>
+                        <div style={{ display: "flex", justifyContent: "flex-end", gap: 7 }}>
+                          <button
+                            className="btn-ghost"
+                            type="button"
+                            style={{ padding: "5px 8px", fontSize: 9.5 }}
+                            onClick={() => setConfirmarEliminacion(false)}
+                          >
+                            Cancelar
+                          </button>
+                          <button
+                            className="btn-ghost"
+                            type="button"
+                            style={{
+                              padding: "5px 8px",
+                              fontSize: 9.5,
+                              color: "#B23A2E",
+                              borderColor: "rgba(178,58,46,0.4)",
+                            }}
+                            onClick={eliminarReservasSeleccionadas}
+                          >
+                            Confirmar eliminación
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
                     {cargandoParticipantes && (
                       <div
                         style={{
@@ -776,10 +953,18 @@ export default function PanelRecreador() {
                                 "1px solid var(--paper-2)",
                             }}
                           >
-                            <div>
-                              <div
-                                style={{
-                                  fontSize:
+                            <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                              <input
+                                type="checkbox"
+                                aria-label={`Seleccionar reserva de ${p.usuario.nombre}`}
+                                checked={seleccionados.includes(p.id)}
+                                onChange={() => toggleSeleccion(p.id)}
+                                style={{ marginTop: 3 }}
+                              />
+                              <div>
+                                <div
+                                  style={{
+                                    fontSize:
                                     12.5,
                                   fontWeight:
                                     700,
@@ -826,6 +1011,7 @@ export default function PanelRecreador() {
                                     espera
                                   </div>
                                 )}
+                              </div>
                             </div>
 
                             <button

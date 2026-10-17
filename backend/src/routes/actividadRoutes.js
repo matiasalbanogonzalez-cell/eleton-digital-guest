@@ -13,6 +13,7 @@ router.post("/", requiereAuth, requiereRol("RECREADOR", "ADMIN"), ctrl.crear);
 router.put("/:id", requiereAuth, requiereRol("RECREADOR", "ADMIN"), ctrl.editar);
 router.post("/:id/cancelar", requiereAuth, requiereRol("RECREADOR", "ADMIN"), ctrl.cancelar);
 router.get("/:id/participantes", requiereAuth, requiereRol("RECREADOR", "ADMIN"), ctrl.listarParticipantes);
+router.patch("/inscripciones/cancelar", requiereAuth, requiereRol("RECREADOR", "ADMIN"), ctrl.cancelarInscripciones);
 router.patch("/inscripciones/:inscripcionId/asistencia", requiereAuth, requiereRol("RECREADOR", "ADMIN"), ctrl.marcarAsistencia);
 
 // Solo admin (regla de negocio: solo el administrador puede eliminar actividades)

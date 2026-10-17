@@ -64,6 +64,8 @@ async function obtener(req, res) {
   res.json(serializar(actividad));
 }
 
+const CATEGORIAS = ["KIDS", "ADOLESCENTES", "ADULTOS"];
+
 // Caso 7: crear actividad (recreador o admin)
 async function crear(req, res) {
   try {
@@ -72,18 +74,80 @@ async function crear(req, res) {
       lugar, edadMinima, edadMaxima, cupoMaximo, instructorId,
     } = req.body;
 
-    if (!nombre || !categoria || !fecha || !horaInicio || !lugar || !cupoMaximo) {
-      return res.status(400).json({
-        error: "nombre, categoria, fecha, horaInicio, lugar y cupoMaximo son obligatorios.",
+    // CA09.2: campos obligatorios
+    const faltantes = [];
+    if (!nombre?.trim()) faltantes.push("nombre");
+    if (!descripcion?.trim()) faltantes.push("descripción");
+    if (!categoria) faltantes.push("categoría");
+    if (!lugar?.trim()) faltantes.push("lugar");
+    if (!fecha) faltantes.push("fecha");
+    if (!horaInicio) faltantes.push("hora de inicio");
+    if (!horaFin) faltantes.push("hora de fin");
+    if (edadMinima === "" || edadMinima == null) faltantes.push("edad mínima");
+    if (edadMaxima === "" || edadMaxima == null) faltantes.push("edad máxima");
+    if (cupoMaximo === "" || cupoMaximo == null) faltantes.push("cupo máximo");
+    if (faltantes.length) {
+      return res.status(400).json({ error: `Faltan datos obligatorios: ${faltantes.join(", ")}.` });
+    }
+
+    // Conversión de tipos (los inputs llegan como texto)
+    const cat = String(categoria).toUpperCase();
+    const fechaDate = new Date(fecha);
+    const min = Number(edadMinima);
+    const max = Number(edadMaxima);
+    const cupo = Number(cupoMaximo);
+
+    // Validaciones de formato y rango
+    if (!CATEGORIAS.includes(cat)) {
+      return res.status(400).json({ error: "La categoría no es válida." });
+    }
+    if (Number.isNaN(fechaDate.getTime())) {
+      return res.status(400).json({ error: "La fecha no es válida." });
+    }
+    if (!Number.isInteger(min) || !Number.isInteger(max) || min < 0 || max < min) {
+      return res.status(400).json({ error: "El rango de edades no es válido." });
+    }
+    if (!Number.isInteger(cupo) || cupo < 1) {
+      return res.status(400).json({ error: "El cupo máximo debe ser un número mayor a 0." });
+    }
+    if (horaFin <= horaInicio) {
+      return res.status(400).json({ error: "La hora de fin debe ser posterior a la de inicio." });
+    }
+
+    // CA09.3 / RN11: no puede repetirse fecha + hora de inicio + categoría + nombre
+    const inicioDia = new Date(fechaDate);
+    inicioDia.setUTCHours(0, 0, 0, 0);
+    const finDia = new Date(inicioDia);
+    finDia.setUTCDate(finDia.getUTCDate() + 1);
+
+    const repetida = await prisma.actividad.findFirst({
+      where: {
+        nombre: nombre.trim(),
+        categoria: cat,
+        horaInicio,
+        fecha: { gte: inicioDia, lt: finDia },
+      },
+    });
+    if (repetida) {
+      return res.status(409).json({
+        error: "Ya existe una actividad con el mismo nombre, categoría, fecha y hora de inicio.",
       });
     }
 
     const actividad = await prisma.actividad.create({
       data: {
-        nombre, descripcion: descripcion || "", categoria, imagenUrl,
-        fecha: new Date(fecha), horaInicio, horaFin: horaFin || "",
-        lugar, edadMinima: edadMinima ?? 0, edadMaxima: edadMaxima ?? 99,
-        cupoMaximo: Number(cupoMaximo), instructorId: instructorId || null,
+        nombre: nombre.trim(),
+        descripcion: descripcion.trim(),
+        categoria: cat,
+        imagenUrl: imagenUrl || null,
+        fecha: fechaDate,
+        horaInicio,
+        horaFin,
+        lugar: lugar.trim(),
+        edadMinima: min,
+        edadMaxima: max,
+        cupoMaximo: cupo,
+        instructorId: instructorId || null,
         creadaPorId: req.usuario.id,
       },
       include: { instructor: true, inscripciones: true },
@@ -92,6 +156,13 @@ async function crear(req, res) {
     res.status(201).json(serializar(actividad));
   } catch (err) {
     console.error(err);
+    // Violación de unicidad (si el esquema tiene la restricción) o clave foránea
+    if (err.code === "P2002") {
+      return res.status(409).json({ error: "Ya existe una actividad con esos datos." });
+    }
+    if (err.code === "P2003") {
+      return res.status(400).json({ error: "El usuario o el instructor indicado no existe. Volvé a iniciar sesión." });
+    }
     res.status(500).json({ error: "Error al crear la actividad." });
   }
 }
@@ -157,6 +228,78 @@ async function listarParticipantes(req, res) {
   res.json(inscripciones);
 }
 
+// Cancela una o varias reservas desde el panel administrativo sin borrar el historial.
+async function cancelarInscripciones(req, res) {
+  const ids = [...new Set(req.body?.inscripcionIds || [])];
+  if (!Array.isArray(req.body?.inscripcionIds) || ids.length === 0 || ids.some((id) => typeof id !== "string")) {
+    return res.status(400).json({ error: "Debés indicar al menos una reserva válida." });
+  }
+
+  try {
+    const resultado = await prisma.$transaction(async (tx) => {
+      const inscripciones = await tx.inscripcion.findMany({
+        where: { id: { in: ids }, estado: { in: ["CONFIRMADA", "LISTA_ESPERA"] } },
+        include: { actividad: { select: { id: true, cupoMaximo: true, estado: true } } },
+      });
+
+      if (inscripciones.length !== ids.length) {
+        const error = new Error("Una o más reservas ya no están activas o no existen.");
+        error.status = 404;
+        throw error;
+      }
+
+      const actividadesAjustar = new Set();
+      for (const inscripcion of inscripciones) {
+        await tx.inscripcion.update({
+          where: { id: inscripcion.id },
+          data: { estado: "CANCELADA", asistio: false },
+        });
+
+        if (inscripcion.estado === "CONFIRMADA") {
+          actividadesAjustar.add(inscripcion.actividadId);
+          const siguiente = await tx.inscripcion.findFirst({
+            where: {
+              actividadId: inscripcion.actividadId,
+              estado: "LISTA_ESPERA",
+              id: { notIn: ids },
+            },
+            orderBy: { fechaInscripcion: "asc" },
+          });
+          if (siguiente) {
+            await tx.inscripcion.update({
+              where: { id: siguiente.id },
+              data: { estado: "CONFIRMADA" },
+            });
+          }
+        }
+      }
+
+      for (const actividadId of actividadesAjustar) {
+        const actividad = await tx.actividad.findUnique({
+          where: { id: actividadId },
+          select: { cupoMaximo: true, estado: true },
+        });
+        const confirmadas = await tx.inscripcion.count({
+          where: { actividadId, estado: "CONFIRMADA" },
+        });
+        if (actividad && actividad.estado !== "CANCELADA" && actividad.estado !== "FINALIZADA") {
+          await tx.actividad.update({
+            where: { id: actividadId },
+            data: { estado: confirmadas >= actividad.cupoMaximo ? "CUPO_LLENO" : "ABIERTA" },
+          });
+        }
+      }
+
+      return { canceladas: inscripciones.length };
+    });
+
+    res.json(resultado);
+  } catch (err) {
+    const status = err.status || 500;
+    if (status === 500) console.error(err);
+    res.status(status).json({ error: err.message || "Error al cancelar las reservas." });
+  }
+}
 // Caso 11: marcar asistencia (recreador/admin)
 async function marcarAsistencia(req, res) {
   const { inscripcionId } = req.params;
@@ -173,5 +316,5 @@ async function marcarAsistencia(req, res) {
 }
 
 module.exports = {
-  listar, obtener, crear, editar, cancelar, eliminar, listarParticipantes, marcarAsistencia,
+  listar, obtener, crear, editar, cancelar, eliminar, listarParticipantes, cancelarInscripciones, marcarAsistencia,
 };

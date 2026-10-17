@@ -1,10 +1,11 @@
 const prisma = require("../lib/prisma");
 const { hashearPassword } = require("../lib/auth");
 
-async function encontrarOCrearHuesped({ nombre, habitacion }) {
+async function encontrarOCrearHuesped({ nombre, apellido, habitacion }) {
   const nombreLimpio = nombre.trim();
+  const apellidoLimpio = apellido.trim();
   const habitacionLimpia = habitacion.trim();
-  const clave = `${nombreLimpio.toLowerCase().replace(/\s+/g, "_")}_${habitacionLimpia.toLowerCase().replace(/\s+/g, "_")}`;
+  const clave = `${nombreLimpio.toLowerCase().replace(/\s+/g, "_")}_${apellidoLimpio.toLowerCase().replace(/\s+/g, "_")}_${habitacionLimpia.toLowerCase().replace(/\s+/g, "_")}`;
   const email = `guest+${encodeURIComponent(clave)}@guest.eleton.local`;
 
   let usuario = await prisma.usuario.findUnique({ where: { email } });
@@ -13,7 +14,7 @@ async function encontrarOCrearHuesped({ nombre, habitacion }) {
     usuario = await prisma.usuario.create({
       data: {
         nombre: nombreLimpio,
-        apellido: "",
+        apellido: apellidoLimpio,
         email,
         passwordHash,
         habitacion: habitacionLimpia,
@@ -31,7 +32,7 @@ async function encontrarOCrearHuesped({ nombre, habitacion }) {
 //  - No puede anotarse si no hay cupos disponibles (pasa a lista de espera).
 //  - Las actividades finalizadas o canceladas no aceptan nuevas inscripciones.
 async function inscribirse(req, res) {
-  const { actividadId, nombre, habitacion, edad } = req.body;
+  const { actividadId, nombre, apellido, habitacion, edad } = req.body;
   const edadNumero = Number(edad);
 
   if (!actividadId) {
@@ -42,11 +43,11 @@ async function inscribirse(req, res) {
   if (req.usuario) {
     usuarioId = req.usuario.id;
   } else {
-    if (!nombre || !habitacion || !edad) {
-      return res.status(400).json({ error: "nombre, habitacion y edad son obligatorios." });
+    if (!nombre || !apellido || !habitacion || !edad) {
+      return res.status(400).json({ error: "nombre, apellido, habitacion y edad son obligatorios." });
     }
 
-    if (!/^[A-Za-z0-9- ]+$/.test(habitacion.trim())) {
+    if (!/^(?:\d+[A-Za-z]?|S[AB])$/i.test(habitacion.trim())) {
       return res.status(400).json({ error: "Número de habitación inválido." });
     }
 
@@ -54,7 +55,7 @@ async function inscribirse(req, res) {
       return res.status(400).json({ error: "Edad inválida." });
     }
 
-    const usuario = await encontrarOCrearHuesped({ nombre, habitacion });
+    const usuario = await encontrarOCrearHuesped({ nombre, apellido, habitacion });
     usuarioId = usuario.id;
   }
 

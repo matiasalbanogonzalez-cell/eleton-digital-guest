@@ -5,6 +5,9 @@ import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import PublicLayout from "../components/PublicLayout";
 import AgendaRecreacion from "../components/AgendaRecreacion";
+import { CATS } from "../constants/categorias";
+
+const CATEGORIAS_FILTRO = ["TODAS", "KIDS", "ADOLESCENTES", "ADULTOS"];
 
 const DIAS = [
   { nombre: "Viernes", fecha: "2026-08-07" },
@@ -21,6 +24,7 @@ export default function Actividades() {
   const navigate = useNavigate();
 
   const [diaSeleccionado, setDiaSeleccionado] = useState(DIAS[0].fecha);
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("TODAS");
   const [actividades, setActividades] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
@@ -30,7 +34,7 @@ export default function Actividades() {
     setError("");
 
     api
-      .listarActividades(token, diaSeleccionado, "TODAS")
+      .listarActividades(token, diaSeleccionado, categoriaSeleccionada)
       .then(setActividades)
       .catch((err) => {
         console.error(err);
@@ -39,7 +43,7 @@ export default function Actividades() {
       .finally(() => {
         setCargando(false);
       });
-  }, [diaSeleccionado, token]);
+  }, [diaSeleccionado, categoriaSeleccionada, token]);
 
   function abrirActividad(actividad) {
     navigate(`/recreacion/actividades/${actividad.id}`);
@@ -72,13 +76,29 @@ export default function Actividades() {
             ))}
           </div>
 
+          <div className="filter-pill-row" style={{ marginBottom: 16 }}>
+            {CATEGORIAS_FILTRO.map((categoria) => (
+              <button
+                key={categoria}
+                className={categoriaSeleccionada === categoria ? "nav-tab active" : "nav-tab"}
+                onClick={() => setCategoriaSeleccionada(categoria)}
+              >
+                {categoria === "TODAS" ? "Todas" : CATS[categoria].label}
+              </button>
+            ))}
+          </div>
+
           <h2 className="agenda-date">{fechaLegible}</h2>
 
           {cargando && <p className="page-message">Cargando agenda...</p>}
           {error && <p className="page-message page-error">{error}</p>}
 
           {!cargando && !error && (
-            <AgendaRecreacion actividades={actividades} onReservar={abrirActividad} />
+            <AgendaRecreacion
+              actividades={actividades}
+              onReservar={abrirActividad}
+              categoriasVisibles={categoriaSeleccionada === "TODAS" ? CATEGORIAS_FILTRO.slice(1) : [categoriaSeleccionada]}
+            />
           )}
         </div>
       </section>
