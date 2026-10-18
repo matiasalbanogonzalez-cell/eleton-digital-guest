@@ -64,4 +64,24 @@ async function yo(req, res) {
   res.json({ usuario: usuarioPublico(usuario) });
 }
 
-module.exports = { registrar, login, yo };
+async function logout(req, res) {
+  const { jti, exp, id } = req.usuario;
+
+  try {
+    await prisma.tokenRevocado.upsert({
+      where: { jti },
+      update: {},
+      create: { jti, usuarioId: id, expiraEn: new Date(exp * 1000) },
+    });
+
+    // Limpieza oportunista: los revocados ya vencidos no aportan nada
+    await prisma.tokenRevocado.deleteMany({ where: { expiraEn: { lt: new Date() } } });
+
+    res.status(204).end();
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al cerrar sesión." });
+  }
+}
+
+module.exports = { registrar, login, yo, logout };

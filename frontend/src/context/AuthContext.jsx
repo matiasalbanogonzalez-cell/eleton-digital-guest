@@ -29,10 +29,19 @@ export function AuthProvider({ children }) {
     setUsuario(nuevoUsuario);
   }
 
-  function cerrarSesion() {
+  async function cerrarSesion() {
+    const tokenActual = token;
     localStorage.removeItem("eleton_token");
     setToken(null);
     setUsuario(null);
+
+    if (!tokenActual) return;
+
+    try {
+      await api.logout(tokenActual);
+    } catch {
+      // Si falla la revocación, el token igual expira a los 7 días
+    }
   }
 
   return (

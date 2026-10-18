@@ -1,5 +1,17 @@
 import ActividadImagen from "./ActividadImagen";
 
+const ESTADOS = {
+  DISPONIBLE: { label: "Disponible", clase: "disponible" },
+  CUPO_LLENO: { label: "Cupo lleno", clase: "cupo-lleno" },
+  CANCELADA: { label: "Cancelada", clase: "cancelada" },
+};
+
+function estadoActividad(actividad) {
+  if (actividad.estado === "CANCELADA") return "CANCELADA";
+  if (actividad.cuposDisponibles <= 0 || actividad.estado === "CUPO_LLENO") return "CUPO_LLENO";
+  return "DISPONIBLE";
+}
+
 export default function ActividadMiniCard({ actividad, onReservar }) {
   const cuposOcupados = actividad ? actividad.cupoMaximo - actividad.cuposDisponibles : 0;
 
@@ -10,6 +22,8 @@ export default function ActividadMiniCard({ actividad, onReservar }) {
       </div>
     );
   }
+
+  const estado = ESTADOS[estadoActividad(actividad)];
 
   return (
     <div className="actividad-mini-card">
@@ -31,6 +45,9 @@ export default function ActividadMiniCard({ actividad, onReservar }) {
         </span>
         <span className="actividad-mini-cupos">
           {cuposOcupados}/{actividad.cupoMaximo} cupos
+        </span>
+        <span className={`actividad-mini-estado ${estado.clase}`}>
+          {estado.label}
         </span>
 
         <button

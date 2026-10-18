@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const { randomUUID } = require("crypto");
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-cambiar";
 const JWT_EXPIRES_IN = "7d";
@@ -8,7 +9,7 @@ function firmarToken(usuario) {
   return jwt.sign(
     { id: usuario.id, rol: usuario.rol, email: usuario.email },
     JWT_SECRET,
-    { expiresIn: JWT_EXPIRES_IN }
+    { expiresIn: JWT_EXPIRES_IN, jwtid: randomUUID() }
   );
 }
 

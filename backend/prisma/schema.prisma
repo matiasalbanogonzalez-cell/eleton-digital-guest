@@ -54,8 +54,21 @@ model Usuario {
   reservasSpa        ReservaSpa[]   @relation("ReservasSpa")
   reservasTeatro     ReservaTeatro[] @relation("ReservasTeatro")
   avisosCreados      Aviso[]        @relation("AvisosCreadosPor")
+  tokensRevocados    TokenRevocado[]
 
   @@map("usuarios")
+}
+
+model TokenRevocado {
+  jti       String   @id
+  usuarioId String
+  expiraEn  DateTime
+  creadoEn  DateTime @default(now())
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([expiraEn])
+  @@map("tokens_revocados")
 }
 
 model Instructor {
