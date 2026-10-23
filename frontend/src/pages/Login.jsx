@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext";
 
@@ -100,7 +100,7 @@ export default function Login() {
             marginTop: 6,
           }}
         >
-          Acceso exclusivo para el personal del hotel
+          Ingresá con tu cuenta de huésped o de personal del hotel
         </div>
 
       </div>
@@ -173,16 +173,25 @@ export default function Login() {
 
       </form>
 
+      <div style={{ textAlign: "center", marginTop: 18 }}>
+        <span className="font-mono" style={{ fontSize: 12, color: "var(--paper-2)", opacity: 0.7 }}>
+          ¿Sos huésped y todavía no tenés cuenta?{" "}
+        </span>
+        <Link to="/registro" className="font-mono" style={{ fontSize: 12, color: "var(--gold)" }}>
+          Creá tu cuenta
+        </Link>
+      </div>
+
       <div
         style={{
           textAlign: "center",
-          marginTop: 24,
+          marginTop: 18,
           fontSize: 10.5,
           color: "var(--paper-2)",
           opacity: 0.5,
         }}
       >
-        Demo: admin@eleton.com / juan.perez@eleton.com — password123
+        Demo: huesped@demo.com / password123
       </div>
 
     </div>
