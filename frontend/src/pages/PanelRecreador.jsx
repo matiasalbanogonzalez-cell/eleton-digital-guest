@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import BarraSuperior from "../components/BarraSuperior";
@@ -8,7 +9,7 @@ import { useToast } from "../context/ToastContext";
 const CATEGORIAS = ["KIDS", "ADOLESCENTES", "ADULTOS"];
 
 export default function PanelRecreador() {
-  const { token } = useAuth();
+  const { token, usuario } = useAuth();
   const { toast } = useToast();
 
   const [actividades, setActividades] = useState([]);
@@ -290,24 +291,42 @@ export default function PanelRecreador() {
               </div>
             </div>
 
-            <button
-              className="btn-primary"
-              style={{
-                padding: "9px 14px",
-                fontSize: 11,
-                whiteSpace: "nowrap",
-              }}
-              onClick={() => {
-                if (mostrarForm) {
-                  setMostrarForm(false);
-                  setActividadEditando(null);
-                } else {
-                  abrirNuevaActividad();
-                }
-              }}
-            >
-              {mostrarForm ? "Cerrar" : "+ Nueva"}
-            </button>
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              {usuario?.rol === "ADMIN" && (
+                <Link
+                  to="/admin/instructores"
+                  className="btn-ghost"
+                  style={{
+                    padding: "9px 14px",
+                    fontSize: 11,
+                    whiteSpace: "nowrap",
+                    textDecoration: "none",
+                    borderColor: "var(--gold)",
+                    color: "var(--gold)",
+                  }}
+                >
+                  👥 Instructores
+                </Link>
+              )}
+              <button
+                className="btn-primary"
+                style={{
+                  padding: "9px 14px",
+                  fontSize: 11,
+                  whiteSpace: "nowrap",
+                }}
+                onClick={() => {
+                  if (mostrarForm) {
+                    setMostrarForm(false);
+                    setActividadEditando(null);
+                  } else {
+                    abrirNuevaActividad();
+                  }
+                }}
+              >
+                {mostrarForm ? "Cerrar" : "+ Nueva"}
+              </button>
+            </div>
           </div>
         </div>
 

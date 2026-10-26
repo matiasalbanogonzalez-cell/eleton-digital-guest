@@ -694,30 +694,79 @@ body {
   box-sizing: border-box;
 }
 
-/* El formulario del panel usa fondo claro; necesita sus propios contrastes. */
-.recreador-form {
+/* Formularios y tarjetas sobre fondo claro en paneles de administración (Restó, Spa, Teatro, Recreación, Avisos, Login/Registro) */
+.panel-form,
+.panel-card,
+.recreador-form,
+form[style*="var(--paper)"] {
   color: var(--text);
 }
 
-.recreador-form .form-label {
-  color: var(--text);
-  opacity: 0.82;
+.panel-form .form-label,
+.panel-card .form-label,
+.recreador-form .form-label,
+form[style*="var(--paper)"] .form-label {
+  color: var(--text) !important;
+  opacity: 0.78 !important;
+  font-weight: 700;
+  letter-spacing: 0.05em;
 }
 
+.panel-form .form-input,
+.panel-form .form-select,
+.panel-card .form-input,
+.panel-card .form-select,
 .recreador-form .form-input,
-.recreador-form .form-select {
-  background: #fffdf6;
-  border: 1px solid rgba(27, 43, 39, 0.22);
-  color: var(--text);
+.recreador-form .form-select,
+form[style*="var(--paper)"] .form-input,
+form[style*="var(--paper)"] .form-select {
+  background: #ffffff !important;
+  border: 1px solid rgba(27, 43, 39, 0.22) !important;
+  color: var(--text) !important;
 }
 
-.recreador-form .form-input::placeholder {
+.panel-form .form-input:focus,
+.panel-form .form-select:focus,
+.panel-card .form-input:focus,
+.panel-card .form-select:focus,
+.recreador-form .form-input:focus,
+.recreador-form .form-select:focus,
+form[style*="var(--paper)"] .form-input:focus,
+form[style*="var(--paper)"] .form-select:focus {
+  outline: none;
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 0 2px rgba(216, 164, 57, 0.25);
+}
+
+.panel-form .form-input::placeholder,
+.panel-card .form-input::placeholder,
+.recreador-form .form-input::placeholder,
+form[style*="var(--paper)"] .form-input::placeholder,
+form[style*="var(--paper)"] .form-select::placeholder {
   color: var(--text-soft);
-  opacity: 1;
+  opacity: 0.75;
 }
 
-.recreador-form input[type="date"] {
+.panel-form input[type="date"],
+.panel-card input[type="date"],
+.recreador-form input[type="date"],
+form[style*="var(--paper)"] input[type="date"] {
   color-scheme: light;
+}
+
+/* Botones ghost dentro de paneles y tarjetas con fondo claro */
+.panel-card .btn-ghost,
+.panel-form .btn-ghost,
+form[style*="var(--paper)"] .btn-ghost {
+  color: var(--ink);
+  border: 1px solid rgba(27, 43, 39, 0.25);
+}
+
+.panel-card .btn-ghost:hover,
+.panel-form .btn-ghost:hover,
+form[style*="var(--paper)"] .btn-ghost:hover {
+  background: rgba(27, 43, 39, 0.06);
+  border-color: rgba(27, 43, 39, 0.4);
 }
 .form-input[aria-invalid="true"] {
   outline: 2px solid #E87969;

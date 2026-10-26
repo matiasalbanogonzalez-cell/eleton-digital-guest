@@ -46,6 +46,7 @@ model Usuario {
   habitacion    String?
   telefono      String?
   rol           Rol       @default(HUESPED)
+  activo        Boolean   @default(true)
   creadoEn      DateTime  @default(now())
 
   actividadesCreadas Actividad[]    @relation("ActividadesCreadasPor")

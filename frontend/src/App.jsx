@@ -1,4 +1,4 @@
-﻿import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 import ModuloPlaceholder from "./pages/ModuloPlaceholder";
 import Login from "./pages/Login";
@@ -19,6 +19,7 @@ import PanelTeatro from "./pages/PanelTeatro";
 import Dashboard from "./pages/Dashboard";
 import TodasLasReservas from "./pages/TodasLasReservas";
 import PanelAvisos from "./pages/PanelAvisos";
+import PanelInstructores from "./pages/PanelInstructores";
 import Sugerencias from "./pages/Sugerencias";
 import RutaProtegida from "./components/RutaProtegida";
 import { MODULOS } from "./constants/modulos";
@@ -112,6 +113,14 @@ export default function App() {
         element={
           <RutaProtegida rolesPermitidos={["ADMIN"]}>
             <PanelAvisos />
+          </RutaProtegida>
+        }
+      />
+      <Route
+        path="/admin/instructores"
+        element={
+          <RutaProtegida rolesPermitidos={["ADMIN"]}>
+            <PanelInstructores />
           </RutaProtegida>
         }
       />

@@ -44,6 +44,7 @@ export default function Dashboard() {
         <div style={{ display: "flex", gap: 8, marginBottom: 14, flexWrap: "wrap" }}>
           <Link to="/admin/reservas" className="btn-ghost" style={linkStyle}>Todas las reservas</Link>
           <Link to="/admin/avisos" className="btn-ghost" style={linkStyle}>Avisos</Link>
+          <Link to="/admin/instructores" className="btn-ghost" style={linkStyle}>Instructores</Link>
           <Link to="/resto/panel" className="btn-ghost" style={linkStyle}>Panel Restó</Link>
           <Link to="/spa/panel" className="btn-ghost" style={linkStyle}>Panel Spa</Link>
           <Link to="/teatro/panel" className="btn-ghost" style={linkStyle}>Panel Teatro</Link>
@@ -66,7 +67,10 @@ export default function Dashboard() {
             </div>
             <div style={cardStyle}>
               <div className="info-label">Recreación</div>
-              <div className="info-value">{resumen.recreacion.inscriptos} inscriptos</div>
+              <div className="info-value">
+                {resumen.recreacion.inscriptos} inscriptos
+                {resumen.recreacion.instructores !== undefined ? ` · ${resumen.recreacion.instructores} instructores` : ""}
+              </div>
             </div>
             <div style={cardStyle}>
               <div className="info-label">Spa</div>

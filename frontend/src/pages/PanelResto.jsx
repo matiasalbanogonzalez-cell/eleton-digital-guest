@@ -246,7 +246,7 @@ export default function PanelResto() {
                         )}
 
                         {reservas.map((r) => (
-                            <div key={r.id} style={cardStyle}>
+                            <div key={r.id} className="panel-card" style={cardStyle}>
                                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                                     <div>
                                         <div style={{ fontWeight: 700, fontSize: 13.5 }}>{r.nombre}</div>
@@ -292,29 +292,31 @@ export default function PanelResto() {
                         </div>
 
                         {mostrarNuevoSalon && (
-                            <form onSubmit={crearSalon} style={{ background: "var(--paper)", borderRadius: 14, padding: 16, marginBottom: 14 }}>
+                            <form onSubmit={crearSalon} className="panel-form" style={{ background: "var(--paper)", borderRadius: 14, padding: 16, marginBottom: 14 }}>
+                                <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 12, color: "var(--ink)" }}>Nuevo salón</div>
                                 <div className="form-field">
                                     <label className="form-label">Nombre</label>
-                                    <input className="form-input" required value={nuevoSalon.nombre} onChange={(e) => setNuevoSalon({ ...nuevoSalon, nombre: e.target.value })} />
+                                    <input className="form-input" required value={nuevoSalon.nombre} onChange={(e) => setNuevoSalon({ ...nuevoSalon, nombre: e.target.value })} placeholder="Ej: Terraza" />
                                 </div>
                                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                                     <div className="form-field">
                                         <label className="form-label">Mesas</label>
-                                        <input className="form-input" type="number" required value={nuevoSalon.mesas} onChange={(e) => setNuevoSalon({ ...nuevoSalon, mesas: e.target.value })} />
+                                        <input className="form-input" type="number" min="1" required value={nuevoSalon.mesas} onChange={(e) => setNuevoSalon({ ...nuevoSalon, mesas: e.target.value })} placeholder="Ej: 20" />
                                     </div>
                                     <div className="form-field">
                                         <label className="form-label">Capacidad (personas)</label>
-                                        <input className="form-input" type="number" required value={nuevoSalon.capacidadPersonas} onChange={(e) => setNuevoSalon({ ...nuevoSalon, capacidadPersonas: e.target.value })} />
+                                        <input className="form-input" type="number" min="1" required value={nuevoSalon.capacidadPersonas} onChange={(e) => setNuevoSalon({ ...nuevoSalon, capacidadPersonas: e.target.value })} placeholder="Ej: 80" />
                                     </div>
                                 </div>
-                                <button className="btn-primary" style={{ width: "100%" }} type="submit">Guardar salón</button>
+                                <button className="btn-primary" style={{ width: "100%", marginTop: 4 }} type="submit">Guardar salón</button>
                             </form>
                         )}
 
                         {salones.map((s) => (
-                            <div key={s.id} style={cardStyle}>
+                            <div key={s.id} className="panel-card" style={cardStyle}>
                                 {editandoSalonId === s.id ? (
                                     <>
+                                        <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 10, color: "var(--ink)" }}>Editar {s.nombre}</div>
                                         <div className="form-field">
                                             <label className="form-label">Nombre</label>
                                             <input className="form-input" value={editForm.nombre} onChange={(e) => setEditForm({ ...editForm, nombre: e.target.value })} />
@@ -322,14 +324,14 @@ export default function PanelResto() {
                                         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                                             <div className="form-field">
                                                 <label className="form-label">Mesas</label>
-                                                <input className="form-input" type="number" value={editForm.mesas} onChange={(e) => setEditForm({ ...editForm, mesas: e.target.value })} />
+                                                <input className="form-input" type="number" min="1" value={editForm.mesas} onChange={(e) => setEditForm({ ...editForm, mesas: e.target.value })} />
                                             </div>
                                             <div className="form-field">
-                                                <label className="form-label">Capacidad</label>
-                                                <input className="form-input" type="number" value={editForm.capacidadPersonas} onChange={(e) => setEditForm({ ...editForm, capacidadPersonas: e.target.value })} />
+                                                <label className="form-label">Capacidad (personas)</label>
+                                                <input className="form-input" type="number" min="1" value={editForm.capacidadPersonas} onChange={(e) => setEditForm({ ...editForm, capacidadPersonas: e.target.value })} />
                                             </div>
                                         </div>
-                                        <div style={{ display: "flex", gap: 8 }}>
+                                        <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
                                             <button className="btn-primary" style={{ padding: "6px 12px", fontSize: 10.5 }} onClick={() => guardarEdicion(s.id)}>Guardar</button>
                                             <button className="btn-ghost" style={{ padding: "6px 12px", fontSize: 10.5 }} onClick={() => setEditandoSalonId(null)}>Cancelar</button>
                                         </div>
@@ -337,7 +339,7 @@ export default function PanelResto() {
                                 ) : (
                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                                         <div>
-                                            <div style={{ fontWeight: 700, fontSize: 13.5 }}>{s.nombre}</div>
+                                            <div style={{ fontWeight: 700, fontSize: 13.5, color: "var(--ink)" }}>{s.nombre}</div>
                                             <div style={{ fontSize: 11, color: "var(--text-soft)" }}>
                                                 {s.mesas} mesas · {s.capacidadPersonas} personas · {s.activo ? "Activo" : "Inactivo"}
                                             </div>
@@ -346,7 +348,12 @@ export default function PanelResto() {
                                             <button className="btn-ghost" style={{ padding: "6px 12px", fontSize: 10.5 }} onClick={() => iniciarEdicion(s)}>Editar</button>
                                             <button
                                                 className="btn-ghost"
-                                                style={{ padding: "6px 12px", fontSize: 10.5, color: s.activo ? "#B23A2E" : "#1F7A4D" }}
+                                                style={{
+                                                    padding: "6px 12px",
+                                                    fontSize: 10.5,
+                                                    color: s.activo ? "#B23A2E" : "#1F7A4D",
+                                                    borderColor: s.activo ? "rgba(178,58,46,0.3)" : "rgba(31,122,77,0.3)",
+                                                }}
                                                 onClick={() => toggleActivo(s.id)}
                                             >
                                                 {s.activo ? "Desactivar" : "Activar"}
@@ -370,7 +377,7 @@ export default function PanelResto() {
                         </p>
 
                         {salones.map((salon) => (
-                            <div key={salon.id} style={cardStyle}>
+                            <div key={salon.id} className="panel-card" style={cardStyle}>
                                 <div style={{ fontWeight: 700, fontSize: 13.5, marginBottom: 8 }}>{salon.nombre}</div>
                                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                                     {configDisponibilidad

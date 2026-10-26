@@ -50,6 +50,10 @@ async function login(req, res) {
       return res.status(401).json({ error: "Credenciales inválidas." });
     }
 
+    if (usuario.activo === false) {
+      return res.status(403).json({ error: "Esta cuenta se encuentra desactivada. Contactá con el administrador." });
+    }
+
     const token = firmarToken(usuario);
     res.json({ token, usuario: usuarioPublico(usuario) });
   } catch (err) {

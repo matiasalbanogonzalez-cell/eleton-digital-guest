@@ -11,7 +11,7 @@ async function dashboard(req, res) {
   const fechaDia = inicioDia(fechaQuery);
   const ahora = new Date();
 
-  const [reservasResto, inscripcionesRecreacion, reservasSpa, reservasTeatro, avisosActivos] = await Promise.all([
+  const [reservasResto, inscripcionesRecreacion, reservasSpa, reservasTeatro, avisosActivos, instructoresRecreacion] = await Promise.all([
     prisma.reservaResto.findMany({ where: { fecha: fechaDia, estado: "CONFIRMADA" } }),
     prisma.inscripcion.findMany({
       where: { estado: "CONFIRMADA", actividad: { fecha: fechaDia } },
@@ -25,12 +25,15 @@ async function dashboard(req, res) {
     prisma.aviso.count({
       where: { activo: true, fechaInicio: { lte: ahora }, fechaFin: { gte: ahora } },
     }),
+    prisma.usuario.count({
+      where: { rol: "RECREADOR", activo: true },
+    }),
   ]);
 
   res.json({
     fecha: fechaQuery,
     resto: { reservas: reservasResto.length, personas: reservasResto.reduce((a, r) => a + r.personas, 0) },
-    recreacion: { inscriptos: inscripcionesRecreacion.length },
+    recreacion: { inscriptos: inscripcionesRecreacion.length, instructores: instructoresRecreacion },
     spa: {
       reservas: reservasSpa.length,
       personas: reservasSpa.reduce((a, r) => a + r.personasAdultos + r.personasNinos, 0),

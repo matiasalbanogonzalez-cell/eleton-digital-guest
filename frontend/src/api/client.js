@@ -321,6 +321,20 @@ export const api = {
   },
 
   // =========================
+  // ADMIN — Instructores de Recreación (rol RECREADOR)
+  // =========================
+
+  listarInstructoresAdmin: (token) => request("/admin/instructores", { token }),
+  crearInstructorAdmin: (token, payload) =>
+    request("/admin/instructores", { method: "POST", body: payload, token }),
+  editarInstructorAdmin: (token, id, payload) =>
+    request(`/admin/instructores/${id}`, { method: "PUT", body: payload, token }),
+  toggleActivoInstructorAdmin: (token, id) =>
+    request(`/admin/instructores/${id}/estado`, { method: "PATCH", token }),
+  eliminarInstructorAdmin: (token, id) =>
+    request(`/admin/instructores/${id}`, { method: "DELETE", token }),
+
+  // =========================
   // SUGERENCIAS
   // =========================
 
