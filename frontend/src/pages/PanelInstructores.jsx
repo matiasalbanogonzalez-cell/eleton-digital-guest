@@ -24,7 +24,6 @@ export default function PanelInstructores() {
     nombre: "",
     apellido: "",
     email: "",
-    password: "",
     telefono: "",
     activo: true,
   });
@@ -56,7 +55,6 @@ export default function PanelInstructores() {
       nombre: "",
       apellido: "",
       email: "",
-      password: "",
       telefono: "",
       activo: true,
     });
@@ -70,7 +68,6 @@ export default function PanelInstructores() {
       nombre: inst.nombre || "",
       apellido: inst.apellido || "",
       email: inst.email || "",
-      password: "", // Dejar vacío para no cambiar
       telefono: inst.telefono || "",
       activo: inst.activo ?? true,
     });
@@ -89,37 +86,27 @@ export default function PanelInstructores() {
     setGuardando(true);
 
     try {
+      if (!form.nombre.trim() || !form.apellido.trim()) {
+        throw new Error("El nombre y apellido del instructor son obligatorios.");
+      }
+
+      const payload = {
+        nombre: form.nombre.trim(),
+        apellido: form.apellido.trim(),
+        email: form.email?.trim() || null,
+        telefono: form.telefono?.trim() || null,
+        activo: form.activo,
+      };
+
       if (instructorEditando) {
         // Modificar
-        const payload = {
-          nombre: form.nombre,
-          apellido: form.apellido,
-          email: form.email,
-          telefono: form.telefono,
-          activo: form.activo,
-        };
-        if (form.password && form.password.trim().length > 0) {
-          payload.password = form.password;
-        }
-
         const actualizado = await api.editarInstructorAdmin(token, instructorEditando.id, payload);
         toast.success(`Datos de ${actualizado.nombre} ${actualizado.apellido} actualizados.`, {
           title: "Instructor modificado",
         });
       } else {
         // Dar de alta
-        if (!form.password || form.password.length < 6) {
-          throw new Error("La contraseña es obligatoria y debe tener al menos 6 caracteres.");
-        }
-
-        const nuevo = await api.crearInstructorAdmin(token, {
-          nombre: form.nombre,
-          apellido: form.apellido,
-          email: form.email,
-          password: form.password,
-          telefono: form.telefono,
-        });
-
+        const nuevo = await api.crearInstructorAdmin(token, payload);
         toast.success(`Instructor ${nuevo.nombre} ${nuevo.apellido} registrado exitosamente.`, {
           title: "Alta de instructor",
         });
@@ -365,42 +352,18 @@ export default function PanelInstructores() {
               </div>
             </div>
 
-            <div className="form-field" style={{ margin: "0 0 12px 0" }}>
-              <label className="form-label">Correo electrónico (Usuario) *</label>
-              <input
-                className="form-input"
-                type="email"
-                required
-                placeholder="juan.perez@eleton.com"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-              />
-            </div>
-
-            <div className="form-field" style={{ margin: "0 0 12px 0" }}>
-              <label className="form-label">
-                {instructorEditando
-                  ? "Nueva contraseña (opcional)"
-                  : "Contraseña de acceso *"}
-              </label>
-              <input
-                className="form-input"
-                type="password"
-                required={!instructorEditando}
-                placeholder={
-                  instructorEditando
-                    ? "Dejar en blanco para conservar actual"
-                    : "Mínimo 6 caracteres"
-                }
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-              />
-              <div style={{ fontSize: 10.5, color: "var(--text-soft)", marginTop: 4 }}>
-                Se almacenará con hash seguro (bcrypt) y servirá para ingresar a /login con rol RECREADOR.
-              </div>
-            </div>
-
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14 }}>
+              <div className="form-field" style={{ margin: 0 }}>
+                <label className="form-label">Correo electrónico (opcional)</label>
+                <input
+                  className="form-input"
+                  type="email"
+                  placeholder="instructor@eleton.com"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                />
+              </div>
+
               <div className="form-field" style={{ margin: 0 }}>
                 <label className="form-label">Teléfono (opcional)</label>
                 <input
@@ -410,18 +373,18 @@ export default function PanelInstructores() {
                   onChange={(e) => setForm({ ...form, telefono: e.target.value })}
                 />
               </div>
+            </div>
 
-              <div className="form-field" style={{ margin: 0 }}>
-                <label className="form-label">Estado de la cuenta</label>
-                <select
-                  className="form-select"
-                  value={form.activo ? "true" : "false"}
-                  onChange={(e) => setForm({ ...form, activo: e.target.value === "true" })}
-                >
-                  <option value="true">Activo (Habilitado)</option>
-                  <option value="false">Desactivado (Bloqueado)</option>
-                </select>
-              </div>
+            <div className="form-field" style={{ margin: "0 0 14px 0" }}>
+              <label className="form-label">Estado del instructor</label>
+              <select
+                className="form-select"
+                value={form.activo ? "true" : "false"}
+                onChange={(e) => setForm({ ...form, activo: e.target.value === "true" })}
+              >
+                <option value="true">Activo (Disponible para asignar actividades)</option>
+                <option value="false">Desactivado (Baja lógica)</option>
+              </select>
             </div>
 
             <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
@@ -630,16 +593,14 @@ export default function PanelInstructores() {
                       borderTop: "1px solid rgba(18,56,50,0.08)",
                     }}
                   >
-                    <div>
-                      <span style={{ fontWeight: 600 }}>Rol:</span> RECREADOR
-                    </div>
                     {inst.telefono && (
                       <div>
                         <span style={{ fontWeight: 600 }}>Tel:</span> {inst.telefono}
                       </div>
                     )}
                     <div>
-                      <span style={{ fontWeight: 600 }}>Actividades creadas:</span> {inst.totalActividades ?? 0}
+                      <span style={{ fontWeight: 600 }}>Actividades asignadas:</span>{" "}
+                      <strong style={{ color: "var(--text)" }}>{inst.actividadesAsignadas ?? inst.totalActividades ?? 0}</strong>
                     </div>
                   </div>
 
@@ -680,18 +641,36 @@ export default function PanelInstructores() {
                       {inst.activo ? "Desactivar" : "Activar"}
                     </button>
 
-                    <button
-                      className="btn-ghost"
-                      style={{
-                        padding: "6px 12px",
-                        fontSize: 11,
-                        color: "#B23A2E",
-                        borderColor: "rgba(178,58,46,0.25)",
-                      }}
-                      onClick={() => setInstructorAEliminar(inst)}
-                    >
-                      🗑 Eliminar
-                    </button>
+                    {(inst.actividadesAsignadas ?? 0) > 0 ? (
+                      <button
+                        className="btn-ghost"
+                        disabled
+                        title={`Tiene ${inst.actividadesAsignadas} actividad(es) asignada(s). Para preservar el histórico, utilizá "Desactivar" (baja lógica).`}
+                        style={{
+                          padding: "6px 12px",
+                          fontSize: 11,
+                          color: "#999",
+                          borderColor: "rgba(0,0,0,0.12)",
+                          cursor: "not-allowed",
+                          opacity: 0.5,
+                        }}
+                      >
+                        🗑 Eliminar
+                      </button>
+                    ) : (
+                      <button
+                        className="btn-ghost"
+                        style={{
+                          padding: "6px 12px",
+                          fontSize: 11,
+                          color: "#B23A2E",
+                          borderColor: "rgba(178,58,46,0.25)",
+                        }}
+                        onClick={() => setInstructorAEliminar(inst)}
+                      >
+                        🗑 Eliminar
+                      </button>
+                    )}
                   </div>
                 </div>
               );
@@ -755,8 +734,7 @@ export default function PanelInstructores() {
                 marginBottom: 16,
               }}
             >
-              <strong>Baja segura:</strong> Se eliminará el usuario y sus sesiones. Si el instructor tiene actividades creadas,
-              estas se conservarán desvinculando la autoría para no perder datos históricos. Si solo querés revocar el acceso sin borrar el historial, podés optar por <strong>Desactivarlo</strong>.
+              <strong>Baja de instructor:</strong> Este instructor no posee actividades asignadas en la agenda, por lo que su registro puede ser eliminado de forma segura. Si preferís conservarlo en la nómina histórica del hotel, podés cancelar y optar por <strong>Desactivarlo</strong> (baja lógica).
             </div>
 
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>

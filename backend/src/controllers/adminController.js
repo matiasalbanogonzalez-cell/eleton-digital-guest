@@ -25,8 +25,8 @@ async function dashboard(req, res) {
     prisma.aviso.count({
       where: { activo: true, fechaInicio: { lte: ahora }, fechaFin: { gte: ahora } },
     }),
-    prisma.usuario.count({
-      where: { rol: "RECREADOR", activo: true },
+    prisma.instructor.count({
+      where: { activo: true },
     }),
   ]);
 

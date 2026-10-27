@@ -73,12 +73,15 @@ model TokenRevocado {
 }
 
 model Instructor {
-  id         String      @id @default(uuid())
-  nombre     String
-  apellido   String
-  telefono   String?
-  email      String?
-  actividades Actividad[]
+  id            String      @id @default(uuid())
+  nombre        String
+  apellido      String
+  telefono      String?
+  email         String?
+  activo        Boolean     @default(true)
+  creadoEn      DateTime    @default(now())
+  actualizadoEn DateTime    @updatedAt
+  actividades   Actividad[]
 
   @@map("instructores")
 }

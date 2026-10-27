@@ -1,16 +1,9 @@
 const prisma = require("../lib/prisma");
-const { hashearPassword } = require("../lib/auth");
 
-function sanitizarUsuario(usuario) {
-  const { passwordHash, ...resto } = usuario;
-  return resto;
-}
-
-// Listar todos los instructores (rol RECREADOR)
+// Listar todos los instructores (entidad Instructor)
 async function listar(req, res) {
   try {
-    const instructores = await prisma.usuario.findMany({
-      where: { rol: "RECREADOR" },
+    const instructores = await prisma.instructor.findMany({
       select: {
         id: true,
         nombre: true,
@@ -19,22 +12,25 @@ async function listar(req, res) {
         telefono: true,
         activo: true,
         creadoEn: true,
+        actualizadoEn: true,
         _count: {
-          select: { actividadesCreadas: true },
+          select: { actividades: true },
         },
       },
       orderBy: [{ activo: "desc" }, { nombre: "asc" }, { apellido: "asc" }],
     });
 
-    const resultado = instructores.map((u) => ({
-      id: u.id,
-      nombre: u.nombre,
-      apellido: u.apellido,
-      email: u.email,
-      telefono: u.telefono,
-      activo: u.activo,
-      creadoEn: u.creadoEn,
-      totalActividades: u._count.actividadesCreadas,
+    const resultado = instructores.map((i) => ({
+      id: i.id,
+      nombre: i.nombre,
+      apellido: i.apellido,
+      email: i.email,
+      telefono: i.telefono,
+      activo: i.activo,
+      creadoEn: i.creadoEn,
+      actualizadoEn: i.actualizadoEn,
+      actividadesAsignadas: i._count.actividades,
+      totalActividades: i._count.actividades,
     }));
 
     res.json(resultado);
@@ -44,77 +40,54 @@ async function listar(req, res) {
   }
 }
 
-// Dar de alta un instructor (rol RECREADOR)
+// Dar de alta un instructor en la tabla instructores
 async function crear(req, res) {
   try {
-    const { nombre, apellido, email, password, telefono } = req.body;
+    const { nombre, apellido, email, telefono } = req.body;
 
-    if (!nombre?.trim() || !apellido?.trim() || !email?.trim() || !password) {
+    if (!nombre?.trim() || !apellido?.trim()) {
       return res.status(400).json({
-        error: "Nombre, apellido, correo electrónico y contraseña son obligatorios.",
+        error: "Nombre y apellido son obligatorios.",
       });
     }
 
-    const emailNormalizado = email.trim().toLowerCase();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(emailNormalizado)) {
-      return res.status(400).json({ error: "El formato del correo electrónico no es válido." });
+    const emailNormalizado = email?.trim() ? email.trim().toLowerCase() : null;
+    if (emailNormalizado) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(emailNormalizado)) {
+        return res.status(400).json({ error: "El formato del correo electrónico no es válido." });
+      }
+
+      const existente = await prisma.instructor.findFirst({
+        where: { email: emailNormalizado },
+      });
+      if (existente) {
+        return res.status(409).json({ error: "Ya existe un instructor registrado con ese correo electrónico." });
+      }
     }
 
-    if (password.length < 6) {
-      return res.status(400).json({ error: "La contraseña debe tener al menos 6 caracteres." });
-    }
-
-    const existente = await prisma.usuario.findUnique({
-      where: { email: emailNormalizado },
-    });
-    if (existente) {
-      return res.status(409).json({ error: "Ya existe un usuario con ese correo electrónico." });
-    }
-
-    const passwordHash = await hashearPassword(password);
-
-    const usuario = await prisma.usuario.create({
+    const instructor = await prisma.instructor.create({
       data: {
         nombre: nombre.trim(),
         apellido: apellido.trim(),
         email: emailNormalizado,
-        passwordHash,
         telefono: telefono?.trim() || null,
-        rol: "RECREADOR",
         activo: true,
       },
     });
 
-    // Sincronizar con el modelo Instructor si existe para consistencia con Actividades
-    try {
-      const instructorExistente = await prisma.instructor.findFirst({
-        where: { email: emailNormalizado },
-      });
-      if (!instructorExistente) {
-        await prisma.instructor.create({
-          data: {
-            nombre: nombre.trim(),
-            apellido: apellido.trim(),
-            email: emailNormalizado,
-            telefono: telefono?.trim() || null,
-          },
-        });
-      } else {
-        await prisma.instructor.update({
-          where: { id: instructorExistente.id },
-          data: {
-            nombre: nombre.trim(),
-            apellido: apellido.trim(),
-            telefono: telefono?.trim() || null,
-          },
-        });
-      }
-    } catch (e) {
-      console.warn("Aviso: no se pudo sincronizar tabla instructores:", e.message);
-    }
-
-    res.status(201).json(sanitizarUsuario(usuario));
+    res.status(201).json({
+      id: instructor.id,
+      nombre: instructor.nombre,
+      apellido: instructor.apellido,
+      email: instructor.email,
+      telefono: instructor.telefono,
+      activo: instructor.activo,
+      creadoEn: instructor.creadoEn,
+      actualizadoEn: instructor.actualizadoEn,
+      actividadesAsignadas: 0,
+      totalActividades: 0,
+    });
   } catch (err) {
     console.error("Error al crear instructor:", err);
     res.status(500).json({ error: "Error al dar de alta el instructor." });
@@ -125,10 +98,10 @@ async function crear(req, res) {
 async function editar(req, res) {
   try {
     const { id } = req.params;
-    const { nombre, apellido, email, password, telefono, activo } = req.body;
+    const { nombre, apellido, email, telefono, activo } = req.body;
 
-    const actual = await prisma.usuario.findUnique({ where: { id } });
-    if (!actual || actual.rol !== "RECREADOR") {
+    const actual = await prisma.instructor.findUnique({ where: { id } });
+    if (!actual) {
       return res.status(404).json({ error: "Instructor no encontrado." });
     }
 
@@ -145,18 +118,20 @@ async function editar(req, res) {
     }
 
     if (email !== undefined) {
-      const emailNormalizado = email.trim().toLowerCase();
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(emailNormalizado)) {
-        return res.status(400).json({ error: "El formato del correo electrónico no es válido." });
-      }
+      const emailNormalizado = email?.trim() ? email.trim().toLowerCase() : null;
+      if (emailNormalizado) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(emailNormalizado)) {
+          return res.status(400).json({ error: "El formato del correo electrónico no es válido." });
+        }
 
-      if (emailNormalizado !== actual.email) {
-        const enUso = await prisma.usuario.findFirst({
-          where: { email: emailNormalizado, NOT: { id } },
-        });
-        if (enUso) {
-          return res.status(409).json({ error: "Ya existe otro usuario con ese correo electrónico." });
+        if (emailNormalizado !== actual.email) {
+          const enUso = await prisma.instructor.findFirst({
+            where: { email: emailNormalizado, NOT: { id } },
+          });
+          if (enUso) {
+            return res.status(409).json({ error: "Ya existe otro instructor con ese correo electrónico." });
+          }
         }
       }
       datosActualizar.email = emailNormalizado;
@@ -170,59 +145,45 @@ async function editar(req, res) {
       datosActualizar.activo = Boolean(activo);
     }
 
-    if (password && password.trim().length > 0) {
-      if (password.length < 6) {
-        return res.status(400).json({ error: "La nueva contraseña debe tener al menos 6 caracteres." });
-      }
-      datosActualizar.passwordHash = await hashearPassword(password);
-    }
-
-    const actualizado = await prisma.usuario.update({
+    const actualizado = await prisma.instructor.update({
       where: { id },
       data: datosActualizar,
+      include: {
+        _count: { select: { actividades: true } },
+      },
     });
 
-    // Sincronizar tabla instructores
-    try {
-      const emailABuscar = actual.email;
-      const instRecord = await prisma.instructor.findFirst({
-        where: { email: emailABuscar },
-      });
-      if (instRecord) {
-        await prisma.instructor.update({
-          where: { id: instRecord.id },
-          data: {
-            nombre: actualizado.nombre,
-            apellido: actualizado.apellido,
-            email: actualizado.email,
-            telefono: actualizado.telefono,
-          },
-        });
-      }
-    } catch (e) {
-      console.warn("Aviso: no se pudo sincronizar tabla instructores en edición:", e.message);
-    }
-
-    res.json(sanitizarUsuario(actualizado));
+    res.json({
+      id: actualizado.id,
+      nombre: actualizado.nombre,
+      apellido: actualizado.apellido,
+      email: actualizado.email,
+      telefono: actualizado.telefono,
+      activo: actualizado.activo,
+      creadoEn: actualizado.creadoEn,
+      actualizadoEn: actualizado.actualizadoEn,
+      actividadesAsignadas: actualizado._count.actividades,
+      totalActividades: actualizado._count.actividades,
+    });
   } catch (err) {
     console.error("Error al editar instructor:", err);
     res.status(500).json({ error: "Error al actualizar los datos del instructor." });
   }
 }
 
-// Activar o desactivar instructor
+// Activar o desactivar instructor (Baja Lógica directa en modelo Instructor)
 async function toggleEstado(req, res) {
   try {
     const { id } = req.params;
 
-    const actual = await prisma.usuario.findUnique({ where: { id } });
-    if (!actual || actual.rol !== "RECREADOR") {
+    const actual = await prisma.instructor.findUnique({ where: { id } });
+    if (!actual) {
       return res.status(404).json({ error: "Instructor no encontrado." });
     }
 
     const nuevoEstado = !actual.activo;
 
-    const actualizado = await prisma.usuario.update({
+    const actualizado = await prisma.instructor.update({
       where: { id },
       data: { activo: nuevoEstado },
     });
@@ -241,58 +202,43 @@ async function toggleEstado(req, res) {
   }
 }
 
-// Dar de baja definitiva de forma segura
+// Eliminar instructor:
+// Si tiene actividades asignadas, se bloquea la eliminación física para no romper el histórico
+// y se orienta a la baja lógica (Desactivar).
+// Si no tiene actividades asignadas, se permite la eliminación definitiva.
 async function eliminar(req, res) {
   try {
     const { id } = req.params;
 
-    if (req.usuario.id === id) {
-      return res.status(400).json({ error: "No podés eliminar tu propia cuenta de usuario." });
-    }
+    const actual = await prisma.instructor.findUnique({
+      where: { id },
+      include: {
+        _count: { select: { actividades: true } },
+      },
+    });
 
-    const actual = await prisma.usuario.findUnique({ where: { id } });
-    if (!actual || actual.rol !== "RECREADOR") {
+    if (!actual) {
       return res.status(404).json({ error: "Instructor no encontrado." });
     }
 
-    await prisma.$transaction(async (tx) => {
-      // 1. Revocar tokens de sesión
-      await tx.tokenRevocado.deleteMany({ where: { usuarioId: id } });
+    const totalActividades = actual._count.actividades;
 
-      // 2. Si tenía inscripciones como huésped, removerlas
-      await tx.inscripcion.deleteMany({ where: { usuarioId: id } });
-
-      // 3. Desvincular de actividades creadas (creadaPorId pasa a null)
-      await tx.actividad.updateMany({
-        where: { creadaPorId: id },
-        data: { creadaPorId: null },
+    if (totalActividades > 0) {
+      return res.status(400).json({
+        error: `No se puede eliminar el instructor porque tiene ${totalActividades} actividad(es) asignada(s). Para preservar el histórico de recreación, utilizá la opción "Desactivar" (baja lógica).`,
       });
+    }
 
-      // 4. Si existe registro en tabla 'instructores', desvincular de actividades y eliminarlo
-      const instRecord = await tx.instructor.findFirst({
-        where: { email: actual.email },
-      });
-      if (instRecord) {
-        await tx.actividad.updateMany({
-          where: { instructorId: instRecord.id },
-          data: { instructorId: null },
-        });
-        await tx.instructor.delete({ where: { id: instRecord.id } });
-      }
-
-      // 5. Eliminar usuario
-      await tx.usuario.delete({ where: { id } });
-    });
+    await prisma.instructor.delete({ where: { id } });
 
     res.json({
       ok: true,
-      mensaje: `El instructor ${actual.nombre} ${actual.apellido} fue eliminado de forma segura.`,
+      mensaje: `El instructor ${actual.nombre} ${actual.apellido} fue eliminado correctamente.`,
     });
   } catch (err) {
     console.error("Error al eliminar instructor:", err);
     res.status(500).json({
-      error:
-        "No se pudo eliminar el instructor debido a dependencias activas. Podés desactivarlo en su lugar.",
+      error: "No se pudo eliminar el instructor. Podés desactivarlo en su lugar.",
     });
   }
 }
