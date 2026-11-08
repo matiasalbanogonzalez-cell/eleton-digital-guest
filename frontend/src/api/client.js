@@ -84,6 +84,9 @@ export const api = {
       token,
     }),
 
+  listarInstructoresActivos: (token) =>
+    request("/actividades/instructores-activos", { token }),
+
   crearActividad: (token, payload) =>
     request("/actividades", {
       method: "POST",
@@ -329,6 +332,8 @@ export const api = {
     request("/admin/instructores", { method: "POST", body: payload, token }),
   editarInstructorAdmin: (token, id, payload) =>
     request(`/admin/instructores/${id}`, { method: "PUT", body: payload, token }),
+  actividadesFuturasInstructorAdmin: (token, id) =>
+    request(`/admin/instructores/${id}/actividades-futuras`, { token }),
   toggleActivoInstructorAdmin: (token, id) =>
     request(`/admin/instructores/${id}/estado`, { method: "PATCH", token }),
   eliminarInstructorAdmin: (token, id) =>

@@ -41,7 +41,7 @@ export default function BarraSuperior() {
       </div>
 
       {usuario && (
-        <div className="nav-tabs" style={{ display: "flex", gap: 8, paddingTop: 14, overflowX: "auto" }}>
+        <div className="nav-tabs" style={{ display: "flex", gap: 8, flexWrap: "wrap", paddingTop: 14 }}>
           {!esRecreador && (
             <>
               <Link to="/recreacion" className={`nav-tab ${location.pathname === "/recreacion" ? "active" : ""}`}>

@@ -13,6 +13,7 @@ router.get("/reservas", requiereAuth, requiereRol("ADMIN"), ctrl.todasLasReserva
 router.get("/instructores", requiereAuth, requiereRol("ADMIN"), instructorCtrl.listar);
 router.post("/instructores", requiereAuth, requiereRol("ADMIN"), instructorCtrl.crear);
 router.put("/instructores/:id", requiereAuth, requiereRol("ADMIN"), instructorCtrl.editar);
+router.get("/instructores/:id/actividades-futuras", requiereAuth, requiereRol("ADMIN"), instructorCtrl.actividadesFuturas);
 router.patch("/instructores/:id/estado", requiereAuth, requiereRol("ADMIN"), instructorCtrl.toggleEstado);
 router.delete("/instructores/:id", requiereAuth, requiereRol("ADMIN"), instructorCtrl.eliminar);
 

@@ -1,11 +1,16 @@
 const { Router } = require("express");
 const ctrl = require("../controllers/actividadController");
+const instructorCtrl = require("../controllers/instructorController");
 const { requiereAuth, requiereRol } = require("../middleware/auth");
 
 const router = Router();
 
 // Páginas públicas de actividades
 router.get("/", ctrl.listar);
+
+// Instructores activos para el selector del formulario (debe ir antes de "/:id")
+router.get("/instructores-activos", requiereAuth, requiereRol("RECREADOR", "ADMIN"), instructorCtrl.listarActivos);
+
 router.get("/:id", ctrl.obtener);
 
 // Solo recreador o admin (Casos 7, 8, 9, 10, 11)

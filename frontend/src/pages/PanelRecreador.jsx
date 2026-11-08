@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext";
@@ -15,6 +15,7 @@ export default function PanelRecreador() {
   const [actividades, setActividades] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [mostrarForm, setMostrarForm] = useState(false);
+  const formRef = useRef(null);
   const [actividadEditando, setActividadEditando] = useState(null);
   const [participantesDe, setParticipantesDe] = useState(null);
   const [participantes, setParticipantes] = useState([]);
@@ -22,6 +23,7 @@ export default function PanelRecreador() {
   const [confirmarEliminacion, setConfirmarEliminacion] = useState(false);
   const [cargandoParticipantes, setCargandoParticipantes] = useState(false);
   const [error, setError] = useState("");
+  const [instructoresActivos, setInstructoresActivos] = useState([]);
 
   const [form, setForm] = useState({
     nombre: "",
@@ -34,6 +36,7 @@ export default function PanelRecreador() {
     edadMinima: 0,
     edadMaxima: 99,
     cupoMaximo: 20,
+    instructorId: "",
   });
 
   function limpiarFormulario() {
@@ -48,8 +51,16 @@ export default function PanelRecreador() {
       edadMinima: 0,
       edadMaxima: 99,
       cupoMaximo: 20,
+      instructorId: "",
     });
   }
+
+  // Al abrir el formulario (nueva o edición) se lo lleva a la vista.
+  useEffect(() => {
+    if (mostrarForm && formRef.current) {
+      formRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [mostrarForm, actividadEditando]);
 
   function abrirNuevaActividad() {
     setActividadEditando(null);
@@ -71,6 +82,7 @@ export default function PanelRecreador() {
       edadMinima: actividad.edadMinima ?? 0,
       edadMaxima: actividad.edadMaxima ?? 99,
       cupoMaximo: actividad.cupoMaximo ?? 20,
+      instructorId: actividad.instructor?.id || "",
     });
     setError("");
     setMostrarForm(true);
@@ -87,6 +99,10 @@ export default function PanelRecreador() {
 
   useEffect(() => {
     cargar();
+    // Solo se ofrecen instructores activos al programar una actividad
+    api.listarInstructoresActivos(token)
+      .then((data) => setInstructoresActivos(data || []))
+      .catch(() => setInstructoresActivos([]));
   }, [token]);
 
   function set(campo) {
@@ -232,6 +248,18 @@ export default function PanelRecreador() {
       toast.error(err.message, { title: "Error al cancelar actividad" });
     }
   }
+
+  // Orden de la lista: primero las de hoy y futuras (la más cercana arriba),
+  // después las pasadas (la más reciente primero).
+  const hoy = new Date().toLocaleDateString("en-CA");
+  const clave = (x) => `${new Date(x.fecha).toISOString().slice(0, 10)} ${x.horaInicio || ""}`;
+  const proximas = actividades
+    .filter((x) => clave(x).slice(0, 10) >= hoy)
+    .sort((x, y) => clave(x).localeCompare(clave(y)));
+  const pasadas = actividades
+    .filter((x) => clave(x).slice(0, 10) < hoy)
+    .sort((x, y) => clave(y).localeCompare(clave(x)));
+  const actividadesOrdenadas = [...proximas, ...pasadas];
 
   const totalInscriptos = actividades.reduce(
     (total, actividad) =>
@@ -411,6 +439,7 @@ export default function PanelRecreador() {
 
         {mostrarForm && (
           <form
+            ref={formRef}
             className="recreador-form"
             onSubmit={guardarActividad}
             style={{
@@ -432,7 +461,7 @@ export default function PanelRecreador() {
 
             <div className="form-field">
               <label className="form-label">
-                Nombre
+                Nombre *
               </label>
 
               <input
@@ -446,7 +475,7 @@ export default function PanelRecreador() {
 
             <div className="form-field">
               <label className="form-label">
-                Descripción
+                Descripción *
               </label>
 
               <input
@@ -458,7 +487,7 @@ export default function PanelRecreador() {
 
             <div className="form-field">
               <label className="form-label">
-                Categoría
+                Categoría *
               </label>
 
               <select
@@ -484,7 +513,7 @@ export default function PanelRecreador() {
             >
               <div className="form-field">
                 <label className="form-label">
-                  Lugar
+                  Lugar *
                 </label>
 
                 <input
@@ -497,7 +526,7 @@ export default function PanelRecreador() {
 
               <div className="form-field">
                 <label className="form-label">
-                  Fecha
+                  Fecha *
                 </label>
 
                 <input
@@ -510,7 +539,7 @@ export default function PanelRecreador() {
 
               <div className="form-field">
                 <label className="form-label">
-                  Hora inicio
+                  Hora inicio *
                 </label>
 
                 <input
@@ -522,7 +551,7 @@ export default function PanelRecreador() {
 
               <div className="form-field">
                 <label className="form-label">
-                  Hora fin
+                  Hora fin *
                 </label>
 
                 <input
@@ -534,7 +563,7 @@ export default function PanelRecreador() {
 
               <div className="form-field">
                 <label className="form-label">
-                  Edad mínima
+                  Edad mínima *
                 </label>
 
                 <input
@@ -547,7 +576,7 @@ export default function PanelRecreador() {
 
               <div className="form-field">
                 <label className="form-label">
-                  Edad máxima
+                  Edad máxima *
                 </label>
 
                 <input
@@ -561,7 +590,32 @@ export default function PanelRecreador() {
 
             <div className="form-field">
               <label className="form-label">
-                Cupo máximo
+                Instructor (opcional)
+              </label>
+
+              <select
+                className="form-input"
+                value={form.instructorId}
+                onChange={set("instructorId")}
+              >
+                <option value="">Sin instructor asignado</option>
+                {instructoresActivos.map((i) => (
+                  <option key={i.id} value={i.id}>
+                    {i.nombre} {i.apellido}
+                  </option>
+                ))}
+                {actividadEditando?.instructor &&
+                  !instructoresActivos.some((i) => i.id === actividadEditando.instructor.id) && (
+                    <option value={actividadEditando.instructor.id}>
+                      {actividadEditando.instructor.nombre} {actividadEditando.instructor.apellido} (inactivo, asignado actualmente)
+                    </option>
+                  )}
+              </select>
+            </div>
+
+            <div className="form-field">
+              <label className="form-label">
+                Cupo máximo *
               </label>
 
               <input
@@ -626,7 +680,7 @@ export default function PanelRecreador() {
         ========================= */}
 
         {!cargando &&
-          actividades.map((a) => {
+          actividadesOrdenadas.map((a) => {
             const inscriptos =
               a.cupoMaximo -
               a.cuposDisponibles;
@@ -730,6 +784,19 @@ export default function PanelRecreador() {
                 >
                   Estado: {a.estado}
                 </div>
+
+                {a.instructor && a.instructor.activo === false && (
+                  <div
+                    style={{
+                      marginTop: 6,
+                      fontSize: 10.5,
+                      fontWeight: 600,
+                      color: "#B23A2E",
+                    }}
+                  >
+                    ⚠ Instructor inactivo: {a.instructor.nombre} {a.instructor.apellido}. Editá la actividad para reasignarla.
+                  </div>
+                )}
 
                 {/* BOTONES */}
 

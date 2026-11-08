@@ -66,6 +66,15 @@ async function obtener(req, res) {
 
 const CATEGORIAS = ["KIDS", "ADOLESCENTES", "ADULTOS"];
 
+// Un instructor solo puede asignarse a una actividad si existe y está activo.
+// Devuelve el mensaje de error o null si es válido.
+async function validarInstructorActivo(instructorId) {
+  const instructor = await prisma.instructor.findUnique({ where: { id: instructorId } });
+  if (!instructor) return "El instructor seleccionado no existe.";
+  if (!instructor.activo) return "El instructor seleccionado no está activo.";
+  return null;
+}
+
 // Caso 7: crear actividad (recreador o admin)
 async function crear(req, res) {
   try {
@@ -134,6 +143,14 @@ async function crear(req, res) {
       });
     }
 
+    // Regla: no se pueden asignar instructores inactivos
+    if (instructorId) {
+      const errorInstructor = await validarInstructorActivo(instructorId);
+      if (errorInstructor) {
+        return res.status(400).json({ error: errorInstructor });
+      }
+    }
+
     const actividad = await prisma.actividad.create({
       data: {
         nombre: nombre.trim(),
@@ -175,6 +192,22 @@ async function editar(req, res) {
     if (campos.fecha) campos.fecha = new Date(campos.fecha);
     if (campos.cupoMaximo) campos.cupoMaximo = Number(campos.cupoMaximo);
     delete campos.id;
+
+    // Instructor: vacío = sin instructor; si cambia, debe estar activo
+    if ("instructorId" in campos) {
+      if (!campos.instructorId) {
+        campos.instructorId = null;
+      } else {
+        const actual = await prisma.actividad.findUnique({ where: { id }, select: { instructorId: true } });
+        if (!actual) return res.status(404).json({ error: "Actividad no encontrada." });
+        if (campos.instructorId !== actual.instructorId) {
+          const errorInstructor = await validarInstructorActivo(campos.instructorId);
+          if (errorInstructor) {
+            return res.status(400).json({ error: errorInstructor });
+          }
+        }
+      }
+    }
 
     const actividad = await prisma.actividad.update({
       where: { id },

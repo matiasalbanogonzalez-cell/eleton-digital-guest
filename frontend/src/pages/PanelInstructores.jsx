@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext";
@@ -19,6 +19,7 @@ export default function PanelInstructores() {
 
   // Formulario alta / modificación
   const [mostrarForm, setMostrarForm] = useState(false);
+  const formRef = useRef(null);
   const [instructorEditando, setInstructorEditando] = useState(null);
   const [form, setForm] = useState({
     nombre: "",
@@ -28,9 +29,10 @@ export default function PanelInstructores() {
     activo: true,
   });
 
-  // Modal confirmación de baja definitiva
-  const [instructorAEliminar, setInstructorAEliminar] = useState(null);
-  const [eliminando, setEliminando] = useState(false);
+
+  // Modal de advertencia al desactivar un instructor con actividades futuras
+  const [advertenciaDesactivar, setAdvertenciaDesactivar] = useState(null); // { instructor, cantidad }
+  const [desactivando, setDesactivando] = useState(false);
 
   const cargarInstructores = useCallback(() => {
     setCargando(true);
@@ -61,6 +63,13 @@ export default function PanelInstructores() {
     setError("");
     setMostrarForm(true);
   }
+
+  // Al abrir el formulario (alta o edición) se lo lleva a la vista.
+  useEffect(() => {
+    if (mostrarForm && formRef.current) {
+      formRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [mostrarForm, instructorEditando]);
 
   function abrirEditar(inst) {
     setInstructorEditando(inst);
@@ -122,6 +131,31 @@ export default function PanelInstructores() {
     }
   }
 
+  // Al desactivar: si tiene actividades futuras se advierte y se pide confirmación
+  async function pedirCambioEstado(inst) {
+    if (!inst.activo) {
+      return toggleEstado(inst);
+    }
+    try {
+      const { cantidad, actividades } = await api.actividadesFuturasInstructorAdmin(token, inst.id);
+      if (cantidad > 0) {
+        setAdvertenciaDesactivar({ instructor: inst, cantidad, actividades: actividades || [] });
+      } else {
+        await toggleEstado(inst);
+      }
+    } catch (err) {
+      toast.error(err.message, { title: "Error" });
+    }
+  }
+
+  async function confirmarDesactivacion() {
+    if (!advertenciaDesactivar) return;
+    setDesactivando(true);
+    await toggleEstado(advertenciaDesactivar.instructor);
+    setDesactivando(false);
+    setAdvertenciaDesactivar(null);
+  }
+
   async function toggleEstado(inst) {
     try {
       const res = await api.toggleActivoInstructorAdmin(token, inst.id);
@@ -131,22 +165,6 @@ export default function PanelInstructores() {
       );
     } catch (err) {
       toast.error(err.message, { title: "Error" });
-    }
-  }
-
-  async function confirmarEliminacion() {
-    if (!instructorAEliminar) return;
-    setEliminando(true);
-
-    try {
-      const res = await api.eliminarInstructorAdmin(token, instructorAEliminar.id);
-      toast.success(res.mensaje, { title: "Instructor eliminado" });
-      setInstructorAEliminar(null);
-      cargarInstructores();
-    } catch (err) {
-      toast.error(err.message, { title: "No se pudo eliminar" });
-    } finally {
-      setEliminando(false);
     }
   }
 
@@ -275,6 +293,7 @@ export default function PanelInstructores() {
         ========================= */}
         {mostrarForm && (
           <form
+            ref={formRef}
             onSubmit={guardarInstructor}
             className="panel-form"
             style={{
@@ -604,7 +623,7 @@ export default function PanelInstructores() {
                     </div>
                   </div>
 
-                  {/* Fila inferior: acciones (Modificar, Desactivar/Activar, Eliminar) */}
+                  {/* Fila inferior: acciones (Modificar, Desactivar/Reactivar) */}
                   <div
                     style={{
                       display: "flex",
@@ -636,41 +655,11 @@ export default function PanelInstructores() {
                         color: inst.activo ? "#B23A2E" : "#1F7A4D",
                         borderColor: inst.activo ? "rgba(178,58,46,0.35)" : "rgba(31,122,77,0.35)",
                       }}
-                      onClick={() => toggleEstado(inst)}
+                      onClick={() => pedirCambioEstado(inst)}
                     >
-                      {inst.activo ? "Desactivar" : "Activar"}
+                      {inst.activo ? "Desactivar" : "Reactivar"}
                     </button>
 
-                    {(inst.actividadesAsignadas ?? 0) > 0 ? (
-                      <button
-                        className="btn-ghost"
-                        disabled
-                        title={`Tiene ${inst.actividadesAsignadas} actividad(es) asignada(s). Para preservar el histórico, utilizá "Desactivar" (baja lógica).`}
-                        style={{
-                          padding: "6px 12px",
-                          fontSize: 11,
-                          color: "#999",
-                          borderColor: "rgba(0,0,0,0.12)",
-                          cursor: "not-allowed",
-                          opacity: 0.5,
-                        }}
-                      >
-                        🗑 Eliminar
-                      </button>
-                    ) : (
-                      <button
-                        className="btn-ghost"
-                        style={{
-                          padding: "6px 12px",
-                          fontSize: 11,
-                          color: "#B23A2E",
-                          borderColor: "rgba(178,58,46,0.25)",
-                        }}
-                        onClick={() => setInstructorAEliminar(inst)}
-                      >
-                        🗑 Eliminar
-                      </button>
-                    )}
                   </div>
                 </div>
               );
@@ -680,9 +669,9 @@ export default function PanelInstructores() {
       </div>
 
       {/* =========================
-          MODAL CONFIRMACIÓN DE ELIMINACIÓN
+          MODAL ADVERTENCIA DE DESACTIVACIÓN
       ========================= */}
-      {instructorAEliminar && (
+      {advertenciaDesactivar && (
         <div
           style={{
             position: "fixed",
@@ -711,16 +700,36 @@ export default function PanelInstructores() {
               className="font-display"
               style={{ fontSize: 18, color: "#B23A2E", marginBottom: 8, fontWeight: 700 }}
             >
-              ¿Eliminar instructor?
+              ¿Desactivar instructor?
             </div>
 
             <div style={{ fontSize: 13, lineHeight: 1.5, color: "var(--text)", marginBottom: 12 }}>
-              Estás a punto de dar de baja definitiva a{" "}
               <strong>
-                {instructorAEliminar.nombre} {instructorAEliminar.apellido}
+                {advertenciaDesactivar.instructor.nombre} {advertenciaDesactivar.instructor.apellido}
               </strong>{" "}
-              (<code>{instructorAEliminar.email}</code>).
+              tiene <strong>{advertenciaDesactivar.cantidad}</strong>{" "}
+              {advertenciaDesactivar.cantidad === 1 ? "actividad futura asignada" : "actividades futuras asignadas"}.
             </div>
+
+            {advertenciaDesactivar.actividades?.length > 0 && (
+              <ul
+                style={{
+                  margin: "0 0 12px",
+                  paddingLeft: 18,
+                  fontSize: 12,
+                  lineHeight: 1.5,
+                  color: "var(--text)",
+                  maxHeight: 130,
+                  overflowY: "auto",
+                }}
+              >
+                {advertenciaDesactivar.actividades.map((a) => (
+                  <li key={a.id}>
+                    <strong>{a.nombre}</strong> — {new Date(a.fecha).toLocaleDateString("es-AR", { timeZone: "UTC" })}, {a.horaInicio} a {a.horaFin} hs
+                  </li>
+                ))}
+              </ul>
+            )}
 
             <div
               style={{
@@ -734,7 +743,7 @@ export default function PanelInstructores() {
                 marginBottom: 16,
               }}
             >
-              <strong>Baja de instructor:</strong> Este instructor no posee actividades asignadas en la agenda, por lo que su registro puede ser eliminado de forma segura. Si preferís conservarlo en la nómina histórica del hotel, podés cancelar y optar por <strong>Desactivarlo</strong> (baja lógica).
+              <strong>Atención:</strong> si lo desactivás, esas actividades se mantienen sin cambios (no se cancelan ni se reasignan) y quedarán marcadas como "Instructor inactivo" en el panel del recreador, para que puedan reasignarse al editarlas. El instructor dejará de estar disponible para nuevas actividades.
             </div>
 
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
@@ -742,8 +751,8 @@ export default function PanelInstructores() {
                 type="button"
                 className="btn-ghost"
                 style={{ padding: "8px 14px", color: "var(--text)", borderColor: "rgba(18,56,50,0.25)" }}
-                onClick={() => setInstructorAEliminar(null)}
-                disabled={eliminando}
+                onClick={() => setAdvertenciaDesactivar(null)}
+                disabled={desactivando}
               >
                 Cancelar
               </button>
@@ -758,15 +767,16 @@ export default function PanelInstructores() {
                   cursor: "pointer",
                   border: "none",
                 }}
-                onClick={confirmarEliminacion}
-                disabled={eliminando}
+                onClick={confirmarDesactivacion}
+                disabled={desactivando}
               >
-                {eliminando ? "Eliminando..." : "Confirmar eliminación"}
+                {desactivando ? "Desactivando..." : "Desactivar de todos modos"}
               </button>
             </div>
           </div>
         </div>
       )}
+
     </div>
   );
 }

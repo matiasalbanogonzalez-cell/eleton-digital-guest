@@ -1,5 +1,38 @@
 const prisma = require("../lib/prisma");
 
+// Estados de actividad que ya no cuentan como "futuras"
+const ESTADOS_NO_FUTUROS = ["CANCELADA", "FINALIZADA"];
+
+function inicioDeHoy() {
+  const d = new Date();
+  d.setUTCHours(0, 0, 0, 0);
+  return d;
+}
+
+// Busca otro instructor ACTIVO con el mismo correo o con el mismo nombre y apellido.
+// Devuelve el mensaje de error o null si no hay conflicto.
+async function buscarDuplicadoActivo({ nombre, apellido, email, excluirId }) {
+  const base = { activo: true, ...(excluirId ? { NOT: { id: excluirId } } : {}) };
+
+  if (email) {
+    const porEmail = await prisma.instructor.findFirst({
+      where: { ...base, email: { equals: email, mode: "insensitive" } },
+    });
+    if (porEmail) return "Ya existe un instructor activo registrado con ese correo electrónico.";
+  }
+
+  const porNombre = await prisma.instructor.findFirst({
+    where: {
+      ...base,
+      nombre: { equals: nombre, mode: "insensitive" },
+      apellido: { equals: apellido, mode: "insensitive" },
+    },
+  });
+  if (porNombre) return "Ya existe un instructor activo con ese nombre y apellido.";
+
+  return null;
+}
+
 // Listar todos los instructores (entidad Instructor)
 async function listar(req, res) {
   try {
@@ -57,13 +90,15 @@ async function crear(req, res) {
       if (!emailRegex.test(emailNormalizado)) {
         return res.status(400).json({ error: "El formato del correo electrónico no es válido." });
       }
+    }
 
-      const existente = await prisma.instructor.findFirst({
-        where: { email: emailNormalizado },
-      });
-      if (existente) {
-        return res.status(409).json({ error: "Ya existe un instructor registrado con ese correo electrónico." });
-      }
+    const duplicado = await buscarDuplicadoActivo({
+      nombre: nombre.trim(),
+      apellido: apellido.trim(),
+      email: emailNormalizado,
+    });
+    if (duplicado) {
+      return res.status(409).json({ error: duplicado });
     }
 
     const instructor = await prisma.instructor.create({
@@ -124,15 +159,6 @@ async function editar(req, res) {
         if (!emailRegex.test(emailNormalizado)) {
           return res.status(400).json({ error: "El formato del correo electrónico no es válido." });
         }
-
-        if (emailNormalizado !== actual.email) {
-          const enUso = await prisma.instructor.findFirst({
-            where: { email: emailNormalizado, NOT: { id } },
-          });
-          if (enUso) {
-            return res.status(409).json({ error: "Ya existe otro instructor con ese correo electrónico." });
-          }
-        }
       }
       datosActualizar.email = emailNormalizado;
     }
@@ -143,6 +169,20 @@ async function editar(req, res) {
 
     if (activo !== undefined) {
       datosActualizar.activo = Boolean(activo);
+    }
+
+    // Si el instructor queda activo, no puede coincidir con otro instructor activo
+    const quedaActivo = datosActualizar.activo !== undefined ? datosActualizar.activo : actual.activo;
+    if (quedaActivo) {
+      const duplicado = await buscarDuplicadoActivo({
+        nombre: datosActualizar.nombre ?? actual.nombre,
+        apellido: datosActualizar.apellido ?? actual.apellido,
+        email: datosActualizar.email !== undefined ? datosActualizar.email : actual.email,
+        excluirId: id,
+      });
+      if (duplicado) {
+        return res.status(409).json({ error: duplicado });
+      }
     }
 
     const actualizado = await prisma.instructor.update({
@@ -182,6 +222,19 @@ async function toggleEstado(req, res) {
     }
 
     const nuevoEstado = !actual.activo;
+
+    // Al reactivar, no puede coincidir con otro instructor activo
+    if (nuevoEstado) {
+      const duplicado = await buscarDuplicadoActivo({
+        nombre: actual.nombre,
+        apellido: actual.apellido,
+        email: actual.email,
+        excluirId: id,
+      });
+      if (duplicado) {
+        return res.status(409).json({ error: duplicado });
+      }
+    }
 
     const actualizado = await prisma.instructor.update({
       where: { id },
@@ -243,7 +296,49 @@ async function eliminar(req, res) {
   }
 }
 
+// Cantidad de actividades futuras (no canceladas ni finalizadas) del instructor.
+// El frontend lo usa para advertir antes de desactivar.
+async function actividadesFuturas(req, res) {
+  try {
+    const { id } = req.params;
+    const instructor = await prisma.instructor.findUnique({ where: { id } });
+    if (!instructor) {
+      return res.status(404).json({ error: "Instructor no encontrado." });
+    }
+
+    const cantidad = await prisma.actividad.count({
+      where: {
+        instructorId: id,
+        fecha: { gte: inicioDeHoy() },
+        estado: { notIn: ESTADOS_NO_FUTUROS },
+      },
+    });
+
+    res.json({ cantidad });
+  } catch (err) {
+    console.error("Error al contar actividades futuras:", err);
+    res.status(500).json({ error: "Error al consultar las actividades del instructor." });
+  }
+}
+
+// Solo instructores activos: es lo que se ofrece al crear o editar una actividad.
+async function listarActivos(req, res) {
+  try {
+    const instructores = await prisma.instructor.findMany({
+      where: { activo: true },
+      select: { id: true, nombre: true, apellido: true },
+      orderBy: [{ nombre: "asc" }, { apellido: "asc" }],
+    });
+    res.json(instructores);
+  } catch (err) {
+    console.error("Error al listar instructores activos:", err);
+    res.status(500).json({ error: "Error al obtener los instructores activos." });
+  }
+}
+
 module.exports = {
+  actividadesFuturas,
+  listarActivos,
   listar,
   crear,
   editar,
