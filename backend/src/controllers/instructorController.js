@@ -34,6 +34,21 @@ async function buscarDuplicadoActivo({ nombre, apellido, email, excluirId }) {
 }
 
 // Listar todos los instructores (entidad Instructor)
+// Nombre y apellido: solo letras y espacios (máx. 40). Teléfono: solo números (9 a 15).
+function validarNombreYTelefono({ nombre, apellido, telefono }) {
+  const soloLetras = /^[\p{L} ]+$/u;
+  if (nombre !== undefined && nombre !== null && nombre.trim() && (!soloLetras.test(nombre.trim()) || nombre.trim().length > 40)) {
+    return "El nombre solo puede tener letras (máximo 40 caracteres).";
+  }
+  if (apellido !== undefined && apellido !== null && apellido.trim() && (!soloLetras.test(apellido.trim()) || apellido.trim().length > 40)) {
+    return "El apellido solo puede tener letras (máximo 40 caracteres).";
+  }
+  if (telefono && !/^\d{9,15}$/.test(String(telefono).trim())) {
+    return "El teléfono solo puede tener números, entre 9 y 15 dígitos.";
+  }
+  return null;
+}
+
 async function listar(req, res) {
   try {
     const instructores = await prisma.instructor.findMany({
@@ -83,6 +98,9 @@ async function crear(req, res) {
         error: "Nombre y apellido son obligatorios.",
       });
     }
+
+    const errorFormato = validarNombreYTelefono({ nombre, apellido, telefono });
+    if (errorFormato) return res.status(400).json({ error: errorFormato });
 
     const emailNormalizado = email?.trim() ? email.trim().toLowerCase() : null;
     if (emailNormalizado) {
@@ -141,6 +159,9 @@ async function editar(req, res) {
     }
 
     const datosActualizar = {};
+
+    const errorFormato = validarNombreYTelefono({ nombre, apellido, telefono });
+    if (errorFormato) return res.status(400).json({ error: errorFormato });
 
     if (nombre !== undefined) {
       if (!nombre.trim()) return res.status(400).json({ error: "El nombre no puede estar vacío." });

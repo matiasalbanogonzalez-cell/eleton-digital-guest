@@ -23,7 +23,7 @@ export default function PanelRecreador() {
   const [confirmarEliminacion, setConfirmarEliminacion] = useState(false);
   const [cargandoParticipantes, setCargandoParticipantes] = useState(false);
   const [error, setError] = useState("");
-  const [instructoresActivos, setInstructoresActivos] = useState([]);
+  const [instructoresLista, setInstructoresLista] = useState([]);
 
   const [form, setForm] = useState({
     nombre: "",
@@ -99,10 +99,10 @@ export default function PanelRecreador() {
 
   useEffect(() => {
     cargar();
-    // Solo se ofrecen instructores activos al programar una actividad
-    api.listarInstructoresActivos(token)
-      .then((data) => setInstructoresActivos(data || []))
-      .catch(() => setInstructoresActivos([]));
+    // El selector lista todos los instructores; asignar uno inactivo lo rechaza el servidor (400)
+    api.listarInstructoresAdmin(token)
+      .then((data) => setInstructoresLista(data || []))
+      .catch(() => setInstructoresLista([]));
   }, [token]);
 
   function set(campo) {
@@ -136,8 +136,9 @@ export default function PanelRecreador() {
       limpiarFormulario();
       cargar();
     } catch (err) {
-      setError(err.message);
-      toast.error(err.message, {
+      const mensaje = err.status ? `Error ${err.status}: ${err.message}` : err.message;
+      setError(mensaje);
+      toast.error(mensaje, {
         title: actividadEditando ? "Error al editar actividad" : "Error al crear actividad",
       });
     }
@@ -599,13 +600,13 @@ export default function PanelRecreador() {
                 onChange={set("instructorId")}
               >
                 <option value="">Sin instructor asignado</option>
-                {instructoresActivos.map((i) => (
+                {instructoresLista.map((i) => (
                   <option key={i.id} value={i.id}>
-                    {i.nombre} {i.apellido}
+                    {i.nombre} {i.apellido}{i.activo === false ? " (inactivo)" : ""}
                   </option>
                 ))}
                 {actividadEditando?.instructor &&
-                  !instructoresActivos.some((i) => i.id === actividadEditando.instructor.id) && (
+                  !instructoresLista.some((i) => i.id === actividadEditando.instructor.id) && (
                     <option value={actividadEditando.instructor.id}>
                       {actividadEditando.instructor.nombre} {actividadEditando.instructor.apellido} (inactivo, asignado actualmente)
                     </option>
@@ -1051,52 +1052,52 @@ export default function PanelRecreador() {
                                 <div
                                   style={{
                                     fontSize:
-                                    12.5,
-                                  fontWeight:
-                                    700,
-                                }}
-                              >
-                                {
-                                  p.usuario
-                                    .nombre
-                                }{" "}
-                                {
-                                  p.usuario
-                                    .apellido
-                                }
-                              </div>
+                                      12.5,
+                                    fontWeight:
+                                      700,
+                                  }}
+                                >
+                                  {
+                                    p.usuario
+                                      .nombre
+                                  }{" "}
+                                  {
+                                    p.usuario
+                                      .apellido
+                                  }
+                                </div>
 
-                              <div
-                                style={{
-                                  fontSize:
-                                    10.5,
-                                  color:
-                                    "var(--text-soft)",
-                                  marginTop: 3,
-                                }}
-                              >
-                                Hab.{" "}
-                                {p.usuario
-                                  .habitacion ||
-                                  "—"}
-                              </div>
+                                <div
+                                  style={{
+                                    fontSize:
+                                      10.5,
+                                    color:
+                                      "var(--text-soft)",
+                                    marginTop: 3,
+                                  }}
+                                >
+                                  Hab.{" "}
+                                  {p.usuario
+                                    .habitacion ||
+                                    "—"}
+                                </div>
 
-                              {p.estado ===
-                                "LISTA_ESPERA" && (
-                                  <div
-                                    style={{
-                                      fontSize:
-                                        10,
-                                      color:
-                                        "#B23A2E",
-                                      marginTop:
-                                        3,
-                                    }}
-                                  >
-                                    Lista de
-                                    espera
-                                  </div>
-                                )}
+                                {p.estado ===
+                                  "LISTA_ESPERA" && (
+                                    <div
+                                      style={{
+                                        fontSize:
+                                          10,
+                                        color:
+                                          "#B23A2E",
+                                        marginTop:
+                                          3,
+                                      }}
+                                    >
+                                      Lista de
+                                      espera
+                                    </div>
+                                  )}
                               </div>
                             </div>
 

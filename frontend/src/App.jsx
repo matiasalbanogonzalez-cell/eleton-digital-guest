@@ -20,6 +20,7 @@ import Dashboard from "./pages/Dashboard";
 import TodasLasReservas from "./pages/TodasLasReservas";
 import PanelAvisos from "./pages/PanelAvisos";
 import PanelInstructores from "./pages/PanelInstructores";
+import ListaInstructores from "./pages/ListaInstructores";
 import Sugerencias from "./pages/Sugerencias";
 import RutaProtegida from "./components/RutaProtegida";
 import { MODULOS } from "./constants/modulos";
@@ -46,6 +47,15 @@ export default function App() {
         element={
           <RutaProtegida rolesPermitidos={["RECREADOR", "ADMIN"]}>
             <PanelRecreador />
+          </RutaProtegida>
+        }
+      />
+
+      <Route
+        path="/recreacion/instructores"
+        element={
+          <RutaProtegida rolesPermitidos={["RECREADOR", "ADMIN"]}>
+            <ListaInstructores />
           </RutaProtegida>
         }
       />

@@ -131,18 +131,14 @@ export default function PanelInstructores() {
     }
   }
 
-  // Al desactivar: si tiene actividades futuras se advierte y se pide confirmación
+  // Al desactivar siempre se muestra el modal de advertencia (con o sin actividades futuras)
   async function pedirCambioEstado(inst) {
     if (!inst.activo) {
       return toggleEstado(inst);
     }
     try {
       const { cantidad, actividades } = await api.actividadesFuturasInstructorAdmin(token, inst.id);
-      if (cantidad > 0) {
-        setAdvertenciaDesactivar({ instructor: inst, cantidad, actividades: actividades || [] });
-      } else {
-        await toggleEstado(inst);
-      }
+      setAdvertenciaDesactivar({ instructor: inst, cantidad, actividades: actividades || [] });
     } catch (err) {
       toast.error(err.message, { title: "Error" });
     }
@@ -355,7 +351,8 @@ export default function PanelInstructores() {
                   required
                   placeholder="Ej. Juan"
                   value={form.nombre}
-                  onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+                  maxLength={40}
+                  onChange={(e) => setForm({ ...form, nombre: e.target.value.replace(/[^\p{L} ]/gu, "") })}
                 />
               </div>
 
@@ -366,7 +363,8 @@ export default function PanelInstructores() {
                   required
                   placeholder="Ej. Pérez"
                   value={form.apellido}
-                  onChange={(e) => setForm({ ...form, apellido: e.target.value })}
+                  maxLength={40}
+                  onChange={(e) => setForm({ ...form, apellido: e.target.value.replace(/[^\p{L} ]/gu, "") })}
                 />
               </div>
             </div>
@@ -387,9 +385,12 @@ export default function PanelInstructores() {
                 <label className="form-label">Teléfono (opcional)</label>
                 <input
                   className="form-input"
-                  placeholder="+54 3541..."
+                  placeholder="Ej. 3541123456"
+                  inputMode="numeric"
+                  minLength={9}
+                  maxLength={15}
                   value={form.telefono}
-                  onChange={(e) => setForm({ ...form, telefono: e.target.value })}
+                  onChange={(e) => setForm({ ...form, telefono: e.target.value.replace(/\D/g, "") })}
                 />
               </div>
             </div>
@@ -707,8 +708,14 @@ export default function PanelInstructores() {
               <strong>
                 {advertenciaDesactivar.instructor.nombre} {advertenciaDesactivar.instructor.apellido}
               </strong>{" "}
-              tiene <strong>{advertenciaDesactivar.cantidad}</strong>{" "}
-              {advertenciaDesactivar.cantidad === 1 ? "actividad futura asignada" : "actividades futuras asignadas"}.
+              {advertenciaDesactivar.cantidad === 0 ? (
+                <>no tiene actividades futuras asignadas.</>
+              ) : (
+                <>
+                  tiene <strong>{advertenciaDesactivar.cantidad}</strong>{" "}
+                  {advertenciaDesactivar.cantidad === 1 ? "actividad futura asignada" : "actividades futuras asignadas"}.
+                </>
+              )}
             </div>
 
             {advertenciaDesactivar.actividades?.length > 0 && (
@@ -743,7 +750,10 @@ export default function PanelInstructores() {
                 marginBottom: 16,
               }}
             >
-              <strong>Atención:</strong> si lo desactivás, esas actividades se mantienen sin cambios (no se cancelan ni se reasignan) y quedarán marcadas como "Instructor inactivo" en el panel del recreador, para que puedan reasignarse al editarlas. El instructor dejará de estar disponible para nuevas actividades.
+              <strong>Atención:</strong>{" "}
+              {advertenciaDesactivar.cantidad === 0
+                ? "si lo desactivás, el instructor dejará de estar disponible para nuevas actividades. Sus actividades pasadas se conservan en el historial y podrás reactivarlo cuando quieras."
+                : 'si lo desactivás, esas actividades se mantienen sin cambios (no se cancelan ni se reasignan) y quedarán marcadas como "Instructor inactivo" en el panel del recreador, para que puedan reasignarse al editarlas. El instructor dejará de estar disponible para nuevas actividades.'}
             </div>
 
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
@@ -770,7 +780,7 @@ export default function PanelInstructores() {
                 onClick={confirmarDesactivacion}
                 disabled={desactivando}
               >
-                {desactivando ? "Desactivando..." : "Desactivar de todos modos"}
+                {desactivando ? "Desactivando..." : advertenciaDesactivar.cantidad === 0 ? "Desactivar" : "Desactivar de todos modos"}
               </button>
             </div>
           </div>

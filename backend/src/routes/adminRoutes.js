@@ -10,7 +10,7 @@ router.get("/dashboard", requiereAuth, requiereRol("ADMIN"), ctrl.dashboard);
 router.get("/reservas", requiereAuth, requiereRol("ADMIN"), ctrl.todasLasReservas);
 
 // Gestión de Instructores de Recreación (rol RECREADOR)
-router.get("/instructores", requiereAuth, requiereRol("ADMIN"), instructorCtrl.listar);
+router.get("/instructores", requiereAuth, requiereRol("ADMIN", "RECREADOR"), instructorCtrl.listar);
 router.post("/instructores", requiereAuth, requiereRol("ADMIN"), instructorCtrl.crear);
 router.put("/instructores/:id", requiereAuth, requiereRol("ADMIN"), instructorCtrl.editar);
 router.get("/instructores/:id/actividades-futuras", requiereAuth, requiereRol("ADMIN"), instructorCtrl.actividadesFuturas);

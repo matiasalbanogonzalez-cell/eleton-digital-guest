@@ -191,6 +191,8 @@ async function editar(req, res) {
     const campos = { ...req.body };
     if (campos.fecha) campos.fecha = new Date(campos.fecha);
     if (campos.cupoMaximo) campos.cupoMaximo = Number(campos.cupoMaximo);
+    if (campos.edadMinima !== undefined && campos.edadMinima !== "") campos.edadMinima = Number(campos.edadMinima);
+    if (campos.edadMaxima !== undefined && campos.edadMaxima !== "") campos.edadMaxima = Number(campos.edadMaxima);
     delete campos.id;
 
     // Instructor: vacío = sin instructor; si cambia, debe estar activo

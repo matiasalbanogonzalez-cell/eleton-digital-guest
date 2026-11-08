@@ -20,9 +20,11 @@ async function request(path, { method = "GET", body, token } = {}) {
   const data = await res.json().catch(() => null);
 
   if (!res.ok) {
-    throw new Error(
+    const err = new Error(
       data?.error || `Error ${res.status}`
     );
+    err.status = res.status;
+    throw err;
   }
 
   return data;

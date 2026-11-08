@@ -57,6 +57,11 @@ export default function BarraSuperior() {
               <Link to="/recreacion/panel" className={`nav-tab ${location.pathname === "/recreacion/panel" ? "active" : ""}`}>
                 Panel recreador
               </Link>
+              {usuario?.rol === "RECREADOR" && (
+                <Link to="/recreacion/instructores" className={`nav-tab ${location.pathname === "/recreacion/instructores" ? "active" : ""}`}>
+                  Instructores
+                </Link>
+              )}
               {usuario?.rol === "ADMIN" && (
                 <Link to="/admin/instructores" className={`nav-tab ${location.pathname === "/admin/instructores" ? "active" : ""}`}>
                   Instructores
