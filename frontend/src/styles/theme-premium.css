@@ -1,0 +1,173 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap');
+
+/* =========================================================
+   Tema unificado (rediseño). Se carga después de index.css
+   y lleva toda la app al mismo estilo del inicio:
+   verde bosque, dorado champaña, títulos en serif y texto
+   en Manrope. No cambia ninguna lógica ni ningún texto.
+   ========================================================= */
+
+:root {
+  --gold: #D4BE8A;
+  --paper: #F1ECE0;
+  --paper-2: #D9D2C2;
+  --shadow-gold: 0 10px 26px rgba(212, 190, 138, 0.22);
+}
+
+body {
+  font-family: 'Manrope', system-ui, sans-serif;
+}
+
+/* Fondo de la app: el mismo verde en todas las páginas */
+.site {
+  background: #123832;
+  background-image:
+    radial-gradient(circle at 15% 0%, rgba(212, 190, 138, 0.07), transparent 45%),
+    linear-gradient(180deg, #123832 0%, #0F2E28 100%);
+}
+
+/* Títulos en serif, como en el inicio */
+.font-display,
+.hero-title,
+.section-title,
+.section-title-heading {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+/* Todo lo que tenía Inter pasa a Manrope */
+.actividad-mini-card,
+.actividad-mini-info span,
+.actividad-mini-info strong,
+.actividad-vacia,
+.activity-card-footer,
+.activity-card-meta,
+.activity-card-tag,
+.activity-card-title,
+.agenda-date,
+.agenda-header,
+.agenda-hora,
+.btn-ghost,
+.btn-primary,
+.btn-reservar,
+.cat-badge,
+.detail-label,
+.featured-card h3,
+.featured-card-cta,
+.field-error,
+.field-success,
+.font-mono,
+.footer-columns h3,
+.form-input,
+.form-label,
+.form-select,
+.hero-image-tag,
+.hotel-horario-header h3,
+.hotel-horario-item strong,
+.hotel-wifi-clave,
+.hotel-wifi-red,
+.info-label,
+.info-value,
+.metric-label,
+.module-card-label,
+.nav-drawer-link,
+.nav-drawer-link-tag,
+.nav-tab,
+.navbar-brand-mark,
+.navbar-brand-title,
+.navbar-link,
+.page-empty-title,
+.resto-embed-loading,
+.resto-horario-btn,
+.resto-servicio-btn,
+.resto-stepper-value,
+.stamp,
+.stub-cupos,
+.stub-hora,
+.ticket-nombre,
+.toast-message,
+.toast-title,
+body {
+  font-family: 'Manrope', system-ui, sans-serif;
+}
+
+/* Paneles: mismo verde que las tarjetas del inicio, no negro */
+.page-surface {
+  background: rgba(18, 45, 37, 0.92);
+  border: 1px solid rgba(212, 190, 138, 0.16);
+  border-radius: 26px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+}
+
+/* Botones con forma de píldora, sin mayúsculas */
+.btn-primary {
+  border-radius: 999px;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 15px;
+  transition: background 0.3s;
+}
+.btn-primary:hover:not(:disabled) {
+  background: #E6D3A3;
+}
+.btn-ghost {
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  border-color: rgba(241, 236, 224, 0.35);
+}
+.btn-ghost:hover {
+  border-color: var(--gold);
+}
+
+/* Foco visible con teclado en toda la app */
+.site a:focus-visible,
+.site button:focus-visible,
+.site input:focus-visible,
+.site select:focus-visible,
+.site textarea:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+/* Pie de página alineado con el contenido */
+.site-footer {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding: 44px 20px 52px;
+  border-top: 1px solid rgba(212, 190, 138, 0.16);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 28px;
+  text-align: left;
+}
+.site-footer .footer-brand { margin: 0; justify-content: flex-start; }
+.site-footer .footer-brand-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--paper);
+}
+.site-footer .footer-columns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px 56px;
+  text-align: left;
+}
+.site-footer .footer-columns h3 { color: var(--gold); font-size: 14px; font-weight: 600; margin: 0 0 6px; }
+.site-footer .footer-columns p { color: var(--paper-2); margin: 2px 0; font-size: 14px; }
+.site .site-footer .footer-columns > div { text-align: left; }
+.site .site-footer .footer-columns p {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  text-align: left;
+  padding: 0;
+}

@@ -1,0 +1,329 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600&display=swap');
+
+/* =========================================================
+   Inicio premium (solo para Home.jsx). Todas las clases
+   empiezan con "hp-" para no tocar el resto de la app.
+   ========================================================= */
+
+.hp {
+  --hp-bg: #0A1915;
+  --hp-card: #122D25;
+  --hp-line: #21443A;
+  --hp-text: #F1ECE0;
+  --hp-muted: #A9B9B1;
+  --hp-soft: #D9D2C2;
+  --hp-gold: #D4BE8A;
+  --hp-gold-2: #E6D3A3;
+  --hp-serif: 'Cormorant Garamond', Georgia, serif;
+  --hp-sans: 'Manrope', system-ui, sans-serif;
+
+  color: var(--hp-text);
+  font-family: var(--hp-sans);
+  line-height: 1.6;
+}
+
+.hp a { color: inherit; text-decoration: none; }
+.hp a:focus-visible { outline: 2px solid var(--hp-gold); outline-offset: 4px; }
+
+/* ---------- Encabezado con foto ---------- */
+.hp-hero {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  height: min(820px, 88vh);
+  min-height: 560px;
+  overflow: hidden;
+}
+
+.hp-hero-media {
+  position: absolute;
+  inset: -3%;
+  background: #1F4A3E url('/img/home/hero-piletas-lago.jpg') 50% 30% / cover no-repeat;
+  transform-origin: 50% 28%;
+  animation: hp-drone 14s ease-in-out infinite alternate;
+}
+
+.hp-hero-shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(10, 25, 21, .7) 0%, rgba(10, 25, 21, .35) 40%, rgba(10, 25, 21, 0) 65%),
+    linear-gradient(180deg, rgba(10, 25, 21, .35) 0%, rgba(10, 25, 21, 0) 16%, rgba(10, 25, 21, 0) 45%, rgba(10, 25, 21, .55) 75%, var(--hp-bg) 100%);
+}
+
+.hp-hero-inner {
+  position: relative;
+  height: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 20px 110px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.hp-hero-copy { max-width: 720px; }
+
+.hp-pill {
+  display: inline-block;
+  margin: 0 0 18px;
+  padding: 7px 16px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  background: rgba(10, 25, 21, .55);
+  border: 1px solid rgba(230, 211, 163, .45);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.hp-hero-title {
+  margin: 0;
+  font-family: var(--hp-serif);
+  font-weight: 500;
+  font-size: clamp(52px, 8vw, 96px);
+  line-height: .95;
+  letter-spacing: -.02em;
+  color: var(--hp-text);
+  text-shadow: 0 2px 24px rgba(0, 0, 0, .35);
+}
+.hp-hero-title span { display: block; }
+.hp-hero-title em { display: block; font-style: italic; color: var(--hp-gold-2); }
+
+.hp-hero-sub {
+  margin: 22px 0 0;
+  max-width: 48ch;
+  font-size: 18px;
+  color: #E4DED0;
+}
+
+.hp-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+
+.hp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 22px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 600;
+  transition: background .3s, border-color .3s;
+}
+.hp-btn-gold { background: var(--hp-gold); color: var(--hp-bg) !important; }
+.hp-btn-gold:hover { background: var(--hp-gold-2); }
+.hp-btn-glass {
+  font-weight: 500;
+  border: 1px solid rgba(241, 236, 224, .45);
+  background: rgba(10, 25, 21, .35);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+.hp-btn-glass:hover { border-color: var(--hp-gold); }
+.hp-btn .hp-arrow { transition: transform .3s; }
+.hp-btn:hover .hp-arrow { transform: translateX(4px); }
+
+.hp-glass-card {
+  width: 320px;
+  flex-shrink: 0;
+  padding: 24px;
+  border-radius: 24px;
+  background: rgba(241, 236, 224, .1);
+  border: 1px solid rgba(241, 236, 224, .18);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+}
+.hp-glass-tag { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--hp-gold-2); }
+.hp-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hp-gold); animation: hp-pulse 1.8s infinite; }
+.hp-glass-copy { margin: 10px 0 0; font-family: var(--hp-serif); font-size: 26px; line-height: 1.2; }
+
+/* ---------- Secciones ---------- */
+.hp-section { padding: 90px 0 30px; }
+.hp-eyebrow { margin: 0 0 6px; font-size: 14px; color: var(--hp-gold); letter-spacing: .04em; }
+.hp-rule { width: 80px; height: 1px; background: var(--hp-gold); margin-bottom: 36px; }
+.hp-title {
+  margin: 0 0 36px;
+  font-family: var(--hp-serif);
+  font-weight: 500;
+  font-size: clamp(40px, 5vw, 64px);
+  line-height: 1;
+  color: var(--hp-text);
+}
+
+/* ---------- Tarjetas con foto ---------- */
+.hp-grid { display: grid; gap: 18px; }
+.hp-grid-modules { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+.hp-grid-featured { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.hp-photo-card {
+  position: relative;
+  display: block;
+  height: 340px;
+  border-radius: 26px;
+  overflow: hidden;
+  background: var(--hp-card);
+  color: var(--hp-text);
+}
+.hp-grid-featured .hp-photo-card { height: 480px; border-radius: 24px; }
+
+.hp-photo {
+  position: absolute;
+  inset: 0;
+  background-color: #1F4A3E;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  transition: transform 1.2s cubic-bezier(.2, .7, .2, 1);
+}
+.hp-photo-card:hover .hp-photo { transform: scale(1.08); }
+
+.hp-photo-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(10, 25, 21, 0) 40%, rgba(10, 25, 21, .92) 100%);
+}
+
+.hp-photo-icon { position: absolute; left: 28px; top: 28px; color: var(--hp-gold); }
+
+.hp-photo-body {
+  position: absolute;
+  left: 26px;
+  right: 26px;
+  bottom: 24px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+.hp-photo-label { font-size: 13px; font-weight: 600; color: var(--hp-gold-2); margin-bottom: 4px; }
+.hp-photo-title {
+  margin: 0;
+  font-family: var(--hp-serif);
+  font-size: 38px;
+  font-weight: 600;
+  line-height: 1.03;
+  color: var(--hp-text);
+}
+.hp-photo-text { margin: 6px 0 0; font-size: 15px; line-height: 1.45; color: var(--hp-soft); }
+.hp-photo-link { display: inline-block; margin-top: 10px; font-size: 14px; font-weight: 600; color: var(--hp-gold-2); }
+
+.hp-round {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(241, 236, 224, .35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Sugerencias: última tarjeta, ancha y más baja */
+.hp-photo-card.hp-wide { grid-column: 1 / -1; height: 180px; }
+
+/* Fotos por módulo */
+.hp-img-hotel { background-image: url('/img/home/hotel-lobby.jpg'); background-position: center 55%; }
+.hp-img-recreacion { background-image: url('/img/home/recreacion.jpg'); background-position: 55% 85%; }
+.hp-img-teatro { background-image: url('/img/home/teatro.jpg'); }
+.hp-img-spa { background-image: url('/img/home/spa.jpg'); background-position: center 60%; }
+.hp-img-resto { background-image: url('/img/home/resto-plato.jpg'); background-position: 60% center; }
+.hp-img-eventos { background-image: url('/img/home/eventos-premios-carlos.jpg'); background-position: center 28%; }
+.hp-img-bingo { background-image: url('/img/home/bingo.jpg'); background-position: 40% 60%; }
+.hp-img-proximos { background-image: url('/img/home/proximos-eventos.jpg'); background-color: #0E1822; background-size: 100% auto; background-position: top center; }
+
+/* ---------- Horarios ---------- */
+.hp-info {
+  position: relative;
+  overflow: hidden;
+  margin: 40px 0 80px;
+  padding: 48px;
+  border-radius: 30px;
+  background: #0F261F;
+  border: 1px solid var(--hp-line);
+}
+.hp-info-lines { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .18; pointer-events: none; }
+.hp-info-head { position: relative; margin-bottom: 34px; }
+.hp-info-head .hp-title { margin: 0; font-size: clamp(38px, 4.5vw, 56px); }
+.hp-info-grid { position: relative; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+
+.hp-info-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 26px;
+  border-radius: 22px;
+  background: rgba(241, 236, 224, .05);
+  border: 1px solid rgba(212, 190, 138, .22);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+.hp-info-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1px solid rgba(212, 190, 138, .5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--hp-gold);
+}
+.hp-info-label { font-size: 14px; color: var(--hp-muted); margin-bottom: 6px; }
+.hp-info-value {
+  font-family: var(--hp-sans);
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--hp-text);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+/* ---------- Movimiento ---------- */
+@keyframes hp-drone {
+  0% { transform: scale(1.02) translate(1.5%, 0); }
+  100% { transform: scale(1.12) translate(-1.5%, 1%); }
+}
+@keyframes hp-up {
+  from { opacity: 0; transform: translateY(36px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes hp-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(212, 190, 138, .6); }
+  100% { box-shadow: 0 0 0 12px rgba(212, 190, 138, 0); }
+}
+
+.hp-in-1 { animation: hp-up 1s .15s cubic-bezier(.2, .7, .2, 1) both; }
+.hp-in-2 { animation: hp-up 1s .35s cubic-bezier(.2, .7, .2, 1) both; }
+.hp-in-3 { animation: hp-up 1s .6s cubic-bezier(.2, .7, .2, 1) both; }
+
+@supports (animation-timeline: view()) {
+  .hp-reveal {
+    animation: hp-up linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 40%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hp-hero-media, .hp-in-1, .hp-in-2, .hp-in-3, .hp-reveal, .hp-dot { animation: none !important; }
+  .hp-photo { transition: none; }
+}
+
+/* ---------- Celular ---------- */
+@media (max-width: 900px) {
+  .hp-grid-featured { grid-template-columns: 1fr; }
+  .hp-hero-inner { flex-direction: column; align-items: flex-start; justify-content: flex-end; padding-bottom: 56px; gap: 24px; }
+  .hp-glass-card { width: 100%; box-sizing: border-box; }
+}
+
+@media (max-width: 600px) {
+  .hp-hero { min-height: 720px; }
+  .hp-hero-sub { font-size: 16px; }
+  .hp-grid-modules { grid-template-columns: 1fr; }
+  .hp-photo-card { height: 260px; }
+  .hp-grid-featured .hp-photo-card { height: 380px; }
+  .hp-photo-title { font-size: 32px; }
+  .hp-info { padding: 28px 20px; border-radius: 24px; }
+  .hp-section { padding-top: 64px; }
+}

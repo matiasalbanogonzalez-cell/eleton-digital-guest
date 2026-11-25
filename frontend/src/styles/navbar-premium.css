@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Manrope:wght@500;600&display=swap');
+
+/* Barra superior estilo "vidrio" (rediseño). Usa las mismas
+   clases de Navbar.jsx, solo cambia el aspecto. */
+
+.navbar.navbar--premium {
+  top: 14px;
+  width: calc(100% - 32px);
+  max-width: 1180px;
+  margin: 14px auto 0;
+  padding: 10px 12px 10px 24px;
+  border-radius: 999px;
+  background: rgba(10, 25, 21, .55);
+  border: 1px solid rgba(241, 236, 224, .14);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .18);
+}
+
+.navbar--premium .navbar-brand { align-items: baseline; gap: 10px; }
+
+.navbar--premium .navbar-brand-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 600;
+  font-size: 28px;
+  letter-spacing: .02em;
+  color: #F1ECE0;
+}
+
+.navbar--premium .navbar-brand-subtitle {
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: 13px;
+  letter-spacing: 0;
+  text-transform: none;
+  opacity: 1;
+  color: #D9D2C2;
+}
+
+.navbar--premium .navbar-links { gap: 4px; }
+
+.navbar--premium .navbar-link {
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #D9D2C2;
+  padding: 9px 13px;
+  border-radius: 999px;
+}
+
+.navbar--premium .navbar-link .navbar-link-icon { display: none; }
+
+.navbar--premium .navbar-link:hover {
+  background: rgba(241, 236, 224, .08);
+  color: #F1ECE0;
+  transform: none;
+}
+
+.navbar--premium .navbar-link.is-active {
+  background: transparent;
+  color: #E6D3A3;
+  transform: none;
+}
+
+.navbar--premium .navbar-link-cta,
+.navbar--premium .navbar-link-cta:hover,
+.navbar--premium .navbar-link-cta.is-active {
+  margin-left: 8px;
+  padding: 11px 20px;
+  background: #D4BE8A;
+  color: #0A1915;
+  font-weight: 600;
+}
+
+.navbar--premium .navbar-link-cta:hover { background: #E6D3A3; }
+
+.navbar--premium .navbar-link:focus-visible,
+.navbar--premium .navbar-toggle:focus-visible {
+  outline: 2px solid #D4BE8A;
+  outline-offset: 3px;
+}
+
+.navbar--premium .navbar-toggle {
+  border-radius: 999px;
+  border-color: rgba(241, 236, 224, .25);
+  background: rgba(241, 236, 224, .06);
+}
+
+@media (max-width: 600px) {
+  .navbar.navbar--premium {
+    top: 10px;
+    width: calc(100% - 20px);
+    margin-top: 10px;
+    padding: 8px 8px 8px 18px;
+  }
+  .navbar--premium .navbar-brand-title { font-size: 24px; }
+}

@@ -2,6 +2,7 @@
 import { Link, NavLink } from "react-router-dom";
 import { Menu, X, Home, Sparkles, Theater, Droplet, Coffee, PartyPopper, Key, MessageSquare } from "lucide-react";
 import MobileNavigation from "./MobileNavigation";
+import "../styles/navbar-premium.css";
 
 const NAV_LINKS = [
   { to: "/", label: "Inicio", icon: Home },
@@ -18,13 +19,10 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="navbar">
+      <header className="navbar navbar--premium">
         <Link to="/" className="navbar-brand" onClick={() => setOpen(false)}>
-          <span className="navbar-brand-mark">E</span>
-          <span className="navbar-brand-copy">
-            <span className="navbar-brand-title">ELETON</span>
-            <span className="navbar-brand-subtitle">Digital Guest</span>
-          </span>
+          <span className="navbar-brand-title">Eleton</span>
+          <span className="navbar-brand-subtitle">Digital Guest</span>
         </Link>
 
         <nav className="navbar-links">

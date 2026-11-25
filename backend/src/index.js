@@ -15,7 +15,7 @@ const adminRoutes = require("./routes/adminRoutes");
 const app = express();
 
 app.use(cors({
-  origin: /^http:\/\/localhost:\d+$/ ,
+  origin: [/^http:\/\/localhost:\d+$/, /^https:\/\/[a-z0-9-]+\.app\.github\.dev$/],
   credentials: true
 }));
 app.use(express.json());
